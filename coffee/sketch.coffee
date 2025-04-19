@@ -1,4 +1,4 @@
-VERSION = 4
+VERSION = 5
 SIZE = 100 # meter
 
 FILES = 'abcd'
@@ -22,12 +22,12 @@ dump = (msg) ->
 assert = (a,b) -> if a != b then echo 'assert',a,b
 
 window.touchStarted = () ->
-	dump 'touchStarted'
+	dump "touchStarted"
 	watchID = navigator.geolocation.watchPosition (p) ->
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
 
-		dump "gps #{p.coords.latitude} #{p.coords.longitude} #{distanceBetween matrix.p, matrix[target]}"
+		dump "gps #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]}"
 		grid.p = makePoint matrix.p, matrix.s
 
 		# om man är högst 5 meter från målet, byt mål
@@ -113,9 +113,6 @@ window.setup = ->
 	textSize 40
 	noStroke()
 
-	dump 'setup'
-	dump 'bertil'
-
 	matrix.s = lat: 59.273361, lon: 18.16675
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
 	# echo arr
@@ -179,7 +176,7 @@ window.draw = ->
 	textAlign "left"
 	textSize 20
 	for i in range messages.length
-		text messages[i],500,15+i*20
+		text messages[i], 450,15+i*20
 	pop()
 
 	
