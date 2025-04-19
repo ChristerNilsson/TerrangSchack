@@ -3,6 +3,7 @@
 * Då spelaren är klar med ett uppdrag, hämtas närmaste nya uppdrag
 * Eventuellt går spelaren tillbaks till Home. Måste undersökas
 
+
 # Utdata
 För varje spelare visas.
 * De senaste dragen
