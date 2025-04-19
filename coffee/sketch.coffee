@@ -1,4 +1,4 @@
-VERSION = 5
+VERSION = 6
 SIZE = 100 # meter
 
 FILES = 'abcd'
@@ -74,7 +74,8 @@ bearingBetween = (p,q) ->
 	y = Math.sin(Δλ) * Math.cos(φ2)
 	x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ)
 	θ = Math.atan2(y, x)
-	(180 - θ * 180 / Math.PI) %% 360  # bäring i grader
+	#(180 - θ * 180 / Math.PI) %% 360  # bäring i grader
+	(θ * 180 / Math.PI + 360) % 360  # bäring i grader
 
 deltaXYBetweenPoints = (p,q) ->
 	lat1 = p.lat
