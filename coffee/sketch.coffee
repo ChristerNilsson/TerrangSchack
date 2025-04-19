@@ -1,8 +1,8 @@
-VERSION = 7
+VERSION = 8
 SIZE = 100 # meter
 
-FILES = 'abcd'
-RANKS = '1234'
+FILES = 'efgh'
+RANKS = '4321'
 
 R = 6371e3  # Jordens radie i meter
 
@@ -22,14 +22,12 @@ dump = (msg) ->
 assert = (a,b) -> if a != b then echo 'assert',a,b
 
 window.touchStarted = () ->
-	dump "touchStarted"
+	target = targets.pop()
 	watchID = navigator.geolocation.watchPosition (p) ->
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
-
-		dump "gps #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]}"
 		grid.p = makePoint matrix.s, matrix.p
-		dump "dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 
 		# om man är högst 5 meter från målet, byt mål
 		if target == '' then return
@@ -123,30 +121,29 @@ window.setup = ->
 		for j in [0...4]
 			key = "#{FILES[i]}#{RANKS[j]}"
 			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j+0.5)*SIZE, 180
-			grid[key] = [100*i-350, 100*j-350]
+			grid[key] = [50 + 100*i, 50 + 100*j]
 
 	targets = _.keys matrix
-	targets = _.shuffle targets
-	# echo targets
+	# targets = _.shuffle targets
+	echo targets
 	target = 's'
 
 	# kvadrantens mittpunkt
-	lat = (matrix.b3.lat + matrix.c2.lat) / 2
-	lon = (matrix.b3.lon + matrix.c2.lon) / 2
+	lat = (matrix.f3.lat + matrix.g2.lat) / 2
+	lon = (matrix.f3.lon + matrix.g2.lon) / 2
 	matrix.p = {lat, lon}
 
-	#echo 'matrix',matrix
-	#echo 'grid',grid
+	echo 'matrix',matrix
+	echo 'grid',grid
 
-	assert 224, round distanceBetween matrix.c1, matrix.d3
-
-	assert  27, round bearingBetween matrix.c1, matrix.d3
-	assert  90, round bearingBetween matrix.c3, matrix.d3
-	assert 108, round bearingBetween matrix.a4, matrix.d3
-	assert 214, round bearingBetween matrix.c4, matrix.a1
-	assert 297, round bearingBetween matrix.d2, matrix.b3
+	# assert 224, round distanceBetween matrix.c1, matrix.d3
+	# assert  27, round bearingBetween matrix.c1, matrix.d3
+	# assert  90, round bearingBetween matrix.c3, matrix.d3
+	# assert 108, round bearingBetween matrix.a4, matrix.d3
+	# assert 214, round bearingBetween matrix.c4, matrix.a1
+	# assert 297, round bearingBetween matrix.d2, matrix.b3
 	
-	grid.p = [-200,-200]
+	grid.p = [200,200]
 
 
 window.draw = ->
@@ -157,7 +154,7 @@ window.draw = ->
 	stroke 255
 	[px,py] = grid.p
 	[tx,ty] = grid[target]
-	line 450+px, 50-py, 450+tx, 50-ty
+	line 50+px, 50-py, 50+tx, 50+ty
 	noStroke()
 
 	for key of grid
@@ -165,12 +162,13 @@ window.draw = ->
 		fill 'white'
 		if key == target then fill 'red'
 		if key == 'p' then fill 'yellow'
-		circle 450+x, 50-y, 10
+		text key, 50+x, 50+y
+		circle 50+x, 50+y, 10
 
 	fill 'green'
 	for i in [0...4]
 		text FILES[i], 100+i*100,450
-		text RANKS[i], 50, 450 - (50+i*100)
+		text RANKS[i], 50, 100+i*100
 
 	text 'Ver: ' + VERSION,250,50
 	text round(bearingBetween(matrix.p, matrix[target])) + '°',100,500
