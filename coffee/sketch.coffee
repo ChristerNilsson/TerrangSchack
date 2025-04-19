@@ -1,4 +1,4 @@
-VERSION = 3
+VERSION = 4
 SIZE = 100 # meter
 
 FILES = 'abcd'
@@ -13,19 +13,21 @@ range = _.range
 
 messages = []
 
-#echo = console.log
+echo = console.log
+
 dump = (msg) ->
-	if messages.length > 10 then return
+	if messages.length > 20 then return
 	messages.push msg
 
-assert = (a,b) -> if a!=b then echo 'assert',a,b
+assert = (a,b) -> if a != b then echo 'assert',a,b
 
 window.touchStarted = () ->
 	dump 'touchStarted'
 	watchID = navigator.geolocation.watchPosition (p) ->
-		dump "gps #{p.coords.latitude} #{p.coords.longitude}"
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
+
+		dump "gps #{p.coords.latitude} #{p.coords.longitude} #{distanceBetween matrix.p, matrix[target]}"
 		grid.p = makePoint matrix.p, matrix.s
 
 		# om man är högst 5 meter från målet, byt mål
@@ -35,9 +37,10 @@ window.touchStarted = () ->
 			target = ''
 			return
 		target = targets.pop()
+		dump "target #{target}"
 
 		accuracy = pos.coords.accuracy
-		console.log "Position: #{lat}, #{lon} (±#{accuracy} m)"
+		dump "Position: #{lat}, #{lon} (±#{accuracy} m)"
 		,
 		(err) ->
 			console.error "Fel vid positionshämtning:", err.message
@@ -149,7 +152,7 @@ window.setup = ->
 window.draw = ->
 	background 0
 	fill 255
-	scale 1.8
+	#scale 1.8
 
 	stroke 255
 	line 450+grid.p[0], 50-grid.p[1], 450+grid[target][0], 50-grid[target][1]
