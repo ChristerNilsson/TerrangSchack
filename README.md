@@ -4,6 +4,8 @@
 * Eventuellt går spelaren tillbaks till Home. Måste undersökas
 
 
+
+
 # Utdata
 För varje spelare visas.
 * De senaste dragen
