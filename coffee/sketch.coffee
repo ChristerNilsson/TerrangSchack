@@ -1,0 +1,384 @@
+VERSION = 1
+SIZE = 100 # meter
+
+FILES = 'abcd'
+RANKS = '1234'
+
+R = 6371e3  # Jordens radie i meter
+
+echo = console.log
+targets = []
+target = ""
+
+assert = (a,b) -> if a!=b then echo 'assert',a,b
+
+locationUpdate = (p) ->
+	try
+		echo 'locationUpdate',p
+		matrix.p.lat = p.coords.latitude
+		matrix.p.lon = p.coords.longitude
+		grid.p = makePoint matrix.p, matrix.s
+
+		# om man är högst 5 meter från målet, byt mål
+		if target == '' then return
+		if 5 < distanceBetween matrix.p, matrix[target] then return
+		if targets.length == 0
+			target = ''
+			return
+		target = targets.pop()
+
+	catch error
+		echo error
+
+distanceBetween = (p,q) ->
+	lat1 = p.lat
+	lon1 = p.lon
+	lat2 = q.lat
+	lon2 = q.lon
+	φ1 = lat1 * Math.PI / 180
+	φ2 = lat2 * Math.PI / 180
+	Δφ = (lat2 - lat1) * Math.PI / 180
+	Δλ = (lon2 - lon1) * Math.PI / 180
+	a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2
+	c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+	R * c  # avstånd i meter
+
+bearingBetween = (p,q) ->
+	lat1 = p.lat
+	lon1 = p.lon
+	lat2 = q.lat
+	lon2 = q.lon
+	φ1 = lat1 * Math.PI / 180
+	φ2 = lat2 * Math.PI / 180
+	Δλ = (lon2 - lon1) * Math.PI / 180
+	y = Math.sin(Δλ) * Math.cos(φ2)
+	x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ)
+	θ = Math.atan2(y, x)
+	(180 - θ * 180 / Math.PI) %% 360  # bäring i grader
+
+deltaXYBetweenPoints = (p,q) ->
+	lat1 = p.lat
+	lon1 = p.lon
+	lat2 = q.lat
+	lon2 = q.lon
+	φ1 = lat1 * Math.PI / 180
+	φ2 = lat2 * Math.PI / 180
+	Δφ = (lat2 - lat1) * Math.PI / 180
+	Δλ = (lon2 - lon1) * Math.PI / 180
+	dx = R * Δλ * Math.cos((φ1 + φ2) / 2)  # östlig skillnad
+	dy = R * Δφ                            # nordlig skillnad
+	[dx,dy] # i meter
+
+makePoint = (p,q) -> deltaXYBetweenPoints p, q
+
+matrix = {} # WGS84
+grid = {} # meter
+grid.s = [0,0] # origo, samlingspunkt
+
+destinationPoint = (lat, lon, distance, bearing) -> 
+	φ1 = lat * Math.PI / 180
+	λ1 = lon * Math.PI / 180
+	θ = bearing * Math.PI / 180
+	δ = distance / R
+
+	φ2 = Math.asin(Math.sin(φ1) * Math.cos(δ) + Math.cos(φ1) * Math.sin(δ) * Math.cos(θ))
+	λ2 = λ1 + Math.atan2(Math.sin(θ) * Math.sin(δ) * Math.cos(φ1), Math.cos(δ) - Math.sin(φ1) * Math.sin(φ2))
+
+	lat: φ2 * 180 / Math.PI
+	lon: λ2 * 180 / Math.PI
+
+window.setup = ->
+	createCanvas 8 * SIZE, 8 * SIZE, document.getElementById "canvas"
+	textAlign CENTER,CENTER
+	textSize 40
+	noStroke()
+
+	matrix.s = lat: 59.273361, lon: 18.16675
+	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
+	echo arr
+
+	for i in [0...4]
+		for j in [0...4]
+			key = "#{FILES[i]}#{RANKS[j]}"
+			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j+0.5)*SIZE, 180
+			grid[key] = [100*i-350, 100*j-350]
+
+	targets = _.keys matrix
+	targets = _.shuffle targets
+	echo targets
+	target = 's'
+
+	# kvadrantens mittpunkt
+	lat = (matrix.b3.lat + matrix.c2.lat) / 2
+	lon = (matrix.b3.lon + matrix.c2.lon) / 2
+	matrix.p = {lat, lon}
+
+	echo 'matrix',matrix
+	echo 'grid',grid
+
+	assert 224, round distanceBetween matrix.c1, matrix.d3
+	assert 27, round bearingBetween matrix.c1, matrix.d3
+	assert 90, round bearingBetween matrix.c3, matrix.d3
+	assert 108, round bearingBetween matrix.a4, matrix.d3
+	assert 214, round bearingBetween matrix.c4, matrix.a1
+	assert 297, round bearingBetween matrix.d2, matrix.b3
+	
+	grid.p = [-200,-200]
+
+
+window.draw = ->
+	background 0
+	fill 255
+
+	stroke 255
+	line 450+grid.p[0], 50-grid.p[1], 450+grid[target][0], 50-grid[target][1]
+	noStroke()
+
+	for key of grid
+		[x,y] = grid[key]
+		fill 'white'
+		if key == target then fill 'red'
+		if key == 'p' then fill 'yellow'
+		circle 450+x, 50-y, 10
+
+	fill 'green'
+	for i in [0...4]
+		text FILES[i], 100+i*100,450
+		text RANKS[i], 50, 450 - (50+i*100)
+
+	text 'Ver: ' + VERSION,250,50
+	text round(bearingBetween(matrix.p, matrix[target]))+'°',150,500
+	text target, 250,500
+	text round(distanceBetween(matrix.p, matrix[target]))+'m',350,500
+
+
+	
+
+
+
+
+
+
+
+class Player
+	constructor : (@name, @tx=4*SIZE, @ty=4*SIZE) ->
+		@speed = SPEED
+		@pos = createVector 4*SIZE,4*SIZE
+		@target = new Square createVector @tx, @ty
+		@home = @target
+		@squares = [] # lista med Square som ej påbörjats
+		@trail = []
+		@n = 0
+		@distance = 0
+		@assists = 0
+
+	closest : ->
+		if @squares.length == 0 then return null
+		bestDist = 99999
+		bestSq = @squares[0]
+		for square in @squares
+			d = p5.Vector.dist square.pos, @pos
+			if d < bestDist
+				bestDist = d
+				bestSq = square
+		bestSq
+
+	add : (sq) ->
+		@squares.push sq
+		@target = @closest()
+
+	drawTail : ->
+		if @n % (10/SPEED) == 0 then @trail.push createVector @pos.x, @pos.y
+		@n += 1
+		if @trail.length > MAXTRAIL then @trail.shift()
+		stroke 'black'
+		for i in [0...@trail.length]
+			size = map i, 0, @trail.length - 1, 5,15
+			noFill()
+			ellipse @trail[i].x, @trail[i].y, size, size
+
+	draw : () ->
+		target = @target.pos
+		dx = target.x - @pos.x
+		dy = target.y - @pos.y
+		d = sqrt dx*dx+dy*dy
+
+		stroke 'black'
+
+		# if @name in 'ABCD'
+		line target.x, target.y, @pos.x, @pos.y
+
+		step = p5.Vector.sub(target, @pos).setMag min @speed, d
+		if d < @speed # target nådd
+			if not @target.done
+				@target.done = true
+				@target.carrier = @name
+
+				# Skicka draget om både start.done och slut.done
+				for key of games
+					g = games[key]
+					if g.move and g.move.start.done and g.move.stopp.done						
+						duration = (15/SPEED * (performance.now() - g.move.start.time)/1000)
+
+						if g.index % 2 == 0 then g.duration += duration
+						if g.move.start.carrier == g.move.stopp.carrier
+							carriers = g.move.start.carrier
+						else 
+							carriers = g.move.start.carrier + g.move.stopp.carrier
+
+						if g.move.start.carrier in 'ABCD'
+							echo 'assists: ',g.move.start.carrier,g.move.stopp.carrier
+							players[g.move.start.carrier].assists += 1
+							players[g.move.stopp.carrier].assists += 1
+							echo g.name, g.move.uci, @name, g.move.start.carrier + g.move.stopp.carrier
+
+						g.chess.move { from: g.move.uci.slice(0, 2), to: g.move.uci.slice(2, 4) }
+
+						td = document.getElementById("SEL#{g.name}")
+						td.innerHTML += "#{g.san_moves[g.chess.history().length-1]} by #{carriers} (#{duration.toFixed()} s)<br>"
+
+						document.getElementById("board#{g.name}").innerHTML = shrink g.chess.ascii()
+						updateInfo g.name, @
+
+						g.queue.push g.move
+						g.move = null
+						if g.initMove() == false
+							stoppTime = Date.now()
+							echo 'done', (stoppTime-startTime)/1000
+
+			@squares = _.filter @squares, (sq) -> sq.done == false
+
+			# hämta närmaste uppdrag om sådant finns
+			if @squares.length > 0
+				@target = @closest()
+				d = p5.Vector.dist @pos,@target.pos
+				@distance += d
+
+		@pos.add step
+
+		for square in @squares
+			if @name in 'ABCD'
+				fill 'red'
+			else
+				fill 'black'
+			circle square.pos.x, square.pos.y, 10
+
+		# if @name in 'ABCD'
+		@drawTail()
+		if @name in 'ABCD' then fill 'yellow' else fill 'black'
+		strokeWeight 1
+		circle @pos.x,@pos.y,0.4*SIZE
+		if @name in 'ABCD' then fill 'black' else fill 'yellow'
+		noStroke()
+		# fill 'black'
+		text @name, @pos.x, @pos.y
+
+uci2pos = (uci) -> # t ex e2e4 => [[225,75],[225,175]]
+	startx = uci[0]
+	starty = uci[1]
+	stoppx = uci[2]
+	stoppy = uci[3]
+	result = []
+	x = FILES.indexOf startx
+	y = 7 - RANKS.indexOf starty
+	result.push createVector SIZE/2 + SIZE*x, SIZE/2 + SIZE*y
+	x = FILES.indexOf stoppx
+	y = 7 - RANKS.indexOf stoppy
+	result.push createVector SIZE/2 + SIZE*x, SIZE/2 + SIZE*y
+	result
+
+class Game
+	constructor : (@name, pgn, @link) ->
+		@chess = new Chess()
+		@chess.load_pgn pgn
+		@san_moves = @chess.history() # [Nf3, ...]
+		@uci_moves = (move.from + move.to for move in @chess.history({ verbose: true })) # [g1f3, ...]
+		@move = null
+		@queue = []
+		@duration = 0
+		@chess.reset()
+		@index = -1
+		document.getElementById("link#{@name}").innerHTML = "<a href=\"#{@link}\" target=\"_blank\">Link</a>"
+
+	initMove : ->
+		if @index >= @uci_moves.length - 1 then return false
+		@index += 1
+		if @move != null 
+			echo 'too quick!'
+			return false
+		@move = new Move @uci_moves[@index], @name
+
+		start = @move.uci.slice 0,2
+		stopp = @move.uci.slice 2,4
+
+		antal = 'ABCD'.indexOf @name
+		for i in [0...antal] 
+			start = rotate start
+			stopp = rotate stopp
+
+		if @index % 2 == 0
+			a = "1234"
+			b = "5678"
+			# Dela ut start och stopp till rätt spelare beroende på kvadrant
+			if start[0] in "abcd" and start[1] in a then players.A.add @move.start
+			if start[0] in "efgh" and start[1] in a then players.B.add @move.start
+			if start[0] in "abcd" and start[1] in b then players.C.add @move.start
+			if start[0] in "efgh" and start[1] in b then players.D.add @move.start
+
+			if stopp[0] in "abcd" and stopp[1] in a then players.A.add @move.stopp
+			if stopp[0] in "efgh" and stopp[1] in a then players.B.add @move.stopp
+			if stopp[0] in "abcd" and stopp[1] in b then players.C.add @move.stopp
+			if stopp[0] in "efgh" and stopp[1] in b then players.D.add @move.stopp
+
+		else
+			a = "1234"
+			b = "5678"
+			# Hantera motståndaren
+			# Dela ut start och stopp till rätt spelare beroende på kvadrant
+			if start[0] in "abcd" and start[1] in a then players.G.add @move.start
+			if start[0] in "abcd" and start[1] in b then players.E.add @move.start
+			if start[0] in "efgh" and start[1] in a then players.H.add @move.start
+			if start[0] in "efgh" and start[1] in b then players.F.add @move.start
+
+			if stopp[0] in "abcd" and stopp[1] in a then players.G.add @move.stopp
+			if stopp[0] in "abcd" and stopp[1] in b then players.E.add @move.stopp
+			if stopp[0] in "efgh" and stopp[1] in a then players.H.add @move.stopp
+			if stopp[0] in "efgh" and stopp[1] in b then players.F.add @move.stopp
+		true
+
+class Square 
+	constructor : (@pos, @uci="", @carrier="") -> # Vector
+		@done = false
+		@time = performance.now()
+	
+# rotate = (sq) -> FILES[8-sq[1]] + String 1 + FILES.indexOf sq[0]
+# echo "g3" == rotate "c2"
+# echo "h1" == rotate "a1"
+# echo "h8" == rotate rotate "a1"
+# echo "a8" == rotate rotate rotate "a1"
+# echo "a1" == rotate rotate rotate rotate "a1"
+
+# coordinates = (sq) ->
+# 	x = FILES.indexOf sq[0]
+# 	y = RANKS.indexOf sq[1]
+# 	[x, 7-y]
+# echo _.isEqual [4,4], coordinates "e4"
+# echo _.isEqual [0,7], coordinates "a1"
+
+# toVector = ([x,y]) ->
+# 	createVector SIZE/2 + SIZE*x, SIZE/2 + SIZE*y
+# echo toVector [3,4]
+
+class Move
+	constructor : (@uci, @name) -> # e2e4, B
+		antal = "ABCD".indexOf @name
+		start = @uci.slice 0,2
+		stopp = @uci.slice 2,4
+		for i in [0...antal]
+			start = rotate start
+			stopp = rotate stopp
+		start = toVector coordinates start
+		stopp = toVector coordinates stopp
+		@pos = [start, stopp]
+		@start = new Square start, @uci
+		@stopp = new Square stopp, @uci
