@@ -1,4 +1,4 @@
-VERSION = 6
+VERSION = 7
 SIZE = 100 # meter
 
 FILES = 'abcd'
@@ -28,7 +28,8 @@ window.touchStarted = () ->
 		matrix.p.lon = p.coords.longitude
 
 		dump "gps #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]}"
-		grid.p = makePoint matrix.p, matrix.s
+		grid.p = makePoint matrix.s, matrix.p
+		dump "dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 
 		# om man är högst 5 meter från målet, byt mål
 		if target == '' then return
@@ -138,8 +139,9 @@ window.setup = ->
 	#echo 'grid',grid
 
 	assert 224, round distanceBetween matrix.c1, matrix.d3
-	assert 27, round bearingBetween matrix.c1, matrix.d3
-	assert 90, round bearingBetween matrix.c3, matrix.d3
+
+	assert  27, round bearingBetween matrix.c1, matrix.d3
+	assert  90, round bearingBetween matrix.c3, matrix.d3
 	assert 108, round bearingBetween matrix.a4, matrix.d3
 	assert 214, round bearingBetween matrix.c4, matrix.a1
 	assert 297, round bearingBetween matrix.d2, matrix.b3
@@ -153,7 +155,9 @@ window.draw = ->
 	#scale 1.8
 
 	stroke 255
-	line 450+grid.p[0], 50-grid.p[1], 450+grid[target][0], 50-grid[target][1]
+	[px,py] = grid.p
+	[tx,ty] = grid[target]
+	line 450+px, 50-py, 450+tx, 50-ty
 	noStroke()
 
 	for key of grid
@@ -169,9 +173,9 @@ window.draw = ->
 		text RANKS[i], 50, 450 - (50+i*100)
 
 	text 'Ver: ' + VERSION,250,50
-	text round(bearingBetween(matrix.p, matrix[target]))+'°',100,500
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',100,500
 	text target, 250,500
-	text round(distanceBetween(matrix.p, matrix[target]))+'m',400,500
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',400,500
 
 	push()
 	textAlign "left"
