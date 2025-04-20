@@ -1,4 +1,4 @@
-VERSION = 10
+VERSION = 11
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -155,6 +155,7 @@ window.setup = ->
 	textAlign CENTER,CENTER
 	textSize 40
 	noStroke()
+	frameRate 2
 
 	matrix.s = lat: 59.273361, lon: 18.16675
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
