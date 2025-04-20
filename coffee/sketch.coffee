@@ -1,4 +1,4 @@
-VERSION = 8
+VERSION = 9
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -21,13 +21,21 @@ dump = (msg) ->
 
 assert = (a,b) -> if a != b then echo 'assert',a,b
 
-window.touchStarted = () ->
-	target = targets.pop()
+watchID = null
+
+startTracking = ->
+	if not navigator.geolocation
+		document.querySelector('#status').textContent = "Geolocation stöds inte i din webbläsare."
+		return
+
+	document.querySelector('#status').textContent = "Begär platsdata..."
+
 	watchID = navigator.geolocation.watchPosition (p) ->
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
 		grid.p = makePoint matrix.s, matrix.p
 		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+		document.querySelector('#status').textContent = "#{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
 
 		# om man är högst 5 meter från målet, byt mål
 		if target == '' then return
@@ -40,13 +48,46 @@ window.touchStarted = () ->
 
 		accuracy = pos.coords.accuracy
 		dump "Position: #{lat}, #{lon} (±#{accuracy} m)"
-		,
-		(err) ->
-			console.error "Fel vid positionshämtning:", err.message
+
+		# lat = p.coords.latitude
+		# lon = p.coords.longitude
+		# acc = p.coords.accuracy.toFixed 1
+		# document.querySelector('#status').textContent = "Lat: #{lat}, Lon: #{lon} (±#{acc} m)"
+
+		, (err) -> document.querySelector('#status').textContent = "Fel: #{err.message}"
 		,
 		enableHighAccuracy: true
-		maximumAge: 1000
 		timeout: 5000
+		maximumAge: 1000
+
+document.querySelector('#startBtn').addEventListener 'click', startTracking
+
+# window.touchStarted = () ->
+# 	target = targets.pop()
+# 	watchID = navigator.geolocation.watchPosition (p) ->
+# 		matrix.p.lat = p.coords.latitude
+# 		matrix.p.lon = p.coords.longitude
+# 		grid.p = makePoint matrix.s, matrix.p
+# 		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+
+# 		# om man är högst 5 meter från målet, byt mål
+# 		if target == '' then return
+# 		if 5 < distanceBetween matrix.p, matrix[target] then return
+# 		if targets.length == 0
+# 			target = ''
+# 			return
+# 		target = targets.pop()
+# 		dump "target #{target}"
+
+# 		accuracy = pos.coords.accuracy
+# 		dump "Position: #{lat}, #{lon} (±#{accuracy} m)"
+# 		,
+# 		(err) ->
+# 			console.error "Fel vid positionshämtning:", err.message
+# 		,
+# 		enableHighAccuracy: true
+# 		maximumAge: 1000
+# 		timeout: 5000
 
 
 distanceBetween = (p,q) ->
