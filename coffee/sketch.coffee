@@ -1,4 +1,4 @@
-VERSION = 15
+VERSION = 16
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -120,7 +120,7 @@ window.setup = ->
 	noStroke()
 	frameRate 2
 
-	matrix.s = lat: 59.273361, lon: 18.16675
+	matrix.s = lat: 59.270143, lon: 18.151623 # vägskälet Ö Brotorpsbron
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
 	# echo arr
 
