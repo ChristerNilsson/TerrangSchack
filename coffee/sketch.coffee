@@ -24,6 +24,8 @@ assert = (a,b) -> if a != b then echo 'assert',a,b
 watchID = null
 gpsCount = 0
 
+errFunction = (err) -> document.querySelector('#status').textContent = "Fel: #{err.message}"
+
 startTracking = ->
 	if not navigator.geolocation
 		document.querySelector('#status').textContent = "Geolocation stöds inte i din webbläsare."
@@ -56,8 +58,8 @@ startTracking = ->
 		# acc = p.coords.accuracy.toFixed 1
 		# document.querySelector('#status').textContent = "Lat: #{lat}, Lon: #{lon} (±#{acc} m)"
 
-		, (err) -> document.querySelector('#status').textContent = "Fel: #{err.message}"
-		,
+	, errFunction
+	,
 		enableHighAccuracy: true
 		timeout: 5000
 		maximumAge: 1000
