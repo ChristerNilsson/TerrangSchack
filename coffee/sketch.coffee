@@ -1,4 +1,4 @@
-VERSION = 9
+VERSION = 10
 SIZE = 100 # meter
 
 FILES = 'efgh'

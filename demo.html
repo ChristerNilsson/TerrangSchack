@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Platsuppdatering</title>
+  <style>
+    body { font-family: sans-serif; padding: 1em; }
+    #status { margin-top: 1em; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <button id="startBtn">📍 Starta platsspårning</button>
+  <div id="status">Ej startat ännu</div>
+
+  <script>
+    let watchID = null;
+    let gpsCount = 0
+
+    function startTracking() {
+      const status = document.getElementById('status');
+
+      if (!navigator.geolocation) {
+        status.textContent = "Geolocation stöds inte i din webbläsare.";
+        return;
+      }
+
+      status.textContent = "Begär platsdata...";
+
+      watchID = navigator.geolocation.watchPosition(
+        function(pos) {
+          gpsCount += 1
+          const lat = pos.coords.latitude.toFixed(6);
+          const lon = pos.coords.longitude.toFixed(6);
+          const acc = pos.coords.accuracy.toFixed(1);
+          status.textContent = `${gpsCount} Lat: ${lat}, Lon: ${lon} (±${acc} m)`;
+        },
+        function(err) {
+          status.textContent = `Fel: ${err.message}`;
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 1000
+        }
+      );
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startTracking);
+  </script>
+
+</body>
+</html>
