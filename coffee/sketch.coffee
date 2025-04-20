@@ -1,4 +1,4 @@
-VERSION = 18
+VERSION = 19
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -132,6 +132,7 @@ window.setup = ->
 			grid[key] = [50 + 100*i, 50 + 100*j]
 
 	targets = _.keys matrix
+	targets = 'h1 h2 g1 f1 g2 h3 h4 g3 f2 e1 e2 f3 g4 f4 e3 e4 s p'.split ' '
 	# targets = _.shuffle targets
 	echo targets
 	target = 's'
@@ -140,6 +141,7 @@ window.setup = ->
 	lat = (matrix.f3.lat + matrix.g2.lat) / 2
 	lon = (matrix.f3.lon + matrix.g2.lon) / 2
 	matrix.p = {lat, lon}
+	grid.p = [200,-200]
 
 	echo 'matrix',matrix
 	echo 'grid',grid
@@ -151,7 +153,6 @@ window.setup = ->
 	# assert 214, round bearingBetween matrix.c4, matrix.a1
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 	
-	grid.p = [200,-200]
 
 
 window.draw = ->
