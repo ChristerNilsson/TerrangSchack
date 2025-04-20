@@ -1,4 +1,4 @@
-VERSION = 14
+VERSION = 15
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -9,15 +9,18 @@ R = 6371e3  # Jordens radie i meter
 targets = []
 target = ""
 
-range = _.range
-
 messages = []
 
+matrix = {} # WGS84
+grid = {} # meter
+grid.s = [0,0] # origo, samlingspunkt
+
 echo = console.log
+range = _.range
 
 dump = (msg) ->
-	if messages.length > 20 then return
 	messages.push msg
+	if messages.length > 20 then messages.shift()
 
 assert = (a,b) -> if a != b then echo 'assert',a,b
 
@@ -48,15 +51,6 @@ startTracking = ->
 			target = ''
 			return
 		target = targets.pop()
-		# dump "target #{target}"
-
-		# accuracy = pos.coords.accuracy
-		# dump "Position: #{lat}, #{lon} (±#{accuracy} m)"
-
-		# lat = p.coords.latitude
-		# lon = p.coords.longitude
-		# acc = p.coords.accuracy.toFixed 1
-		# document.querySelector('#status').textContent = "Lat: #{lat}, Lon: #{lon} (±#{acc} m)"
 
 	, errFunction
 	,
@@ -65,34 +59,6 @@ startTracking = ->
 		maximumAge: 1000
 
 document.querySelector('#startBtn').addEventListener 'click', startTracking
-
-# window.touchStarted = () ->
-# 	target = targets.pop()
-# 	watchID = navigator.geolocation.watchPosition (p) ->
-# 		matrix.p.lat = p.coords.latitude
-# 		matrix.p.lon = p.coords.longitude
-# 		grid.p = makePoint matrix.s, matrix.p
-# 		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
-
-# 		# om man är högst 5 meter från målet, byt mål
-# 		if target == '' then return
-# 		if 5 < distanceBetween matrix.p, matrix[target] then return
-# 		if targets.length == 0
-# 			target = ''
-# 			return
-# 		target = targets.pop()
-# 		dump "target #{target}"
-
-# 		accuracy = pos.coords.accuracy
-# 		dump "Position: #{lat}, #{lon} (±#{accuracy} m)"
-# 		,
-# 		(err) ->
-# 			console.error "Fel vid positionshämtning:", err.message
-# 		,
-# 		enableHighAccuracy: true
-# 		maximumAge: 1000
-# 		timeout: 5000
-
 
 distanceBetween = (p,q) ->
 	lat1 = p.lat
@@ -118,7 +84,6 @@ bearingBetween = (p,q) ->
 	y = Math.sin(Δλ) * Math.cos(φ2)
 	x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ)
 	θ = Math.atan2(y, x)
-	#(180 - θ * 180 / Math.PI) %% 360  # bäring i grader
 	(θ * 180 / Math.PI + 360) % 360  # bäring i grader
 
 deltaXYBetweenPoints = (p,q) ->
@@ -135,10 +100,6 @@ deltaXYBetweenPoints = (p,q) ->
 	[dx,dy] # i meter
 
 makePoint = (p,q) -> deltaXYBetweenPoints p, q
-
-matrix = {} # WGS84
-grid = {} # meter
-grid.s = [0,0] # origo, samlingspunkt
 
 destinationPoint = (lat, lon, distance, bearing) -> 
 	φ1 = lat * Math.PI / 180
@@ -208,7 +169,7 @@ window.draw = ->
 		fill 'white'
 		if key == target then fill 'red'
 		if key == 'p' then fill 'yellow'
-		text key, 50+x, 50+y
+		# text key, 50+x, 50+y
 		circle 50+x, 50+y, 10
 
 	fill 'green'
