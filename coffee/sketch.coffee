@@ -1,4 +1,4 @@
-VERSION = 16
+VERSION = 17
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -120,7 +120,7 @@ window.setup = ->
 	noStroke()
 	frameRate 2
 
-	matrix.s = lat: 59.270143, lon: 18.151623 # vägskälet Ö Brotorpsbron
+	matrix.s = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
 	# echo arr
 
