@@ -1,4 +1,4 @@
-VERSION = 17
+VERSION = 18
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -36,14 +36,15 @@ startTracking = ->
 
 	document.querySelector('#status').textContent = "Begär platsdata..."
 
-	watchID = navigator.geolocation.watchPosition (p) ->
+	watchID = navigator.geolocation.watchPosition (p) =>
 		gpsCount += 1
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
 		grid.p = makePoint matrix.s, matrix.p
+		# grid.p[1] = -grid.p[1]
 		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 		document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
-		return 
+
 		# om man är högst 5 meter från målet, byt mål
 		if target == '' then return
 		if 5 < distanceBetween matrix.p, matrix[target] then return
@@ -150,7 +151,7 @@ window.setup = ->
 	# assert 214, round bearingBetween matrix.c4, matrix.a1
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 	
-	grid.p = [200,200]
+	grid.p = [200,-200]
 
 
 window.draw = ->
@@ -160,7 +161,7 @@ window.draw = ->
 
 	stroke 255
 	[px,py] = grid.p
-	[tx,ty] = grid[target]
+	[tx,ty] = grid[target]	
 	line 50+px, 50-py, 50+tx, 50+ty
 	noStroke()
 
@@ -168,9 +169,12 @@ window.draw = ->
 		[x,y] = grid[key]
 		fill 'white'
 		if key == target then fill 'red'
-		if key == 'p' then fill 'yellow'
-		# text key, 50+x, 50+y
-		circle 50+x, 50+y, 10
+		if key == 'p'
+			fill 'yellow'
+			circle 50+x, 50-y, 10
+		else
+			# text key, 50+x, 50+y
+			circle 50+x, 50+y, 10
 
 	fill 'green'
 	for i in [0...4]
