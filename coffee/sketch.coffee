@@ -1,5 +1,6 @@
-VERSION = 19
+VERSION = 20
 SIZE = 100 # meter
+RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
 FILES = 'efgh'
 RANKS = '4321'
@@ -10,6 +11,7 @@ targets = []
 target = ""
 
 messages = []
+sounds = {}
 
 matrix = {} # WGS84
 grid = {} # meter
@@ -41,13 +43,14 @@ startTracking = ->
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
 		grid.p = makePoint matrix.s, matrix.p
+		sounds.soundDown.play()
 		# grid.p[1] = -grid.p[1]
 		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 		document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
 
-		# om man är högst 5 meter från målet, byt mål
+		# om man är inom RADIUS meter från målet, byt mål
 		if target == '' then return
-		if 5 < distanceBetween matrix.p, matrix[target] then return
+		if RADIUS < distanceBetween matrix.p, matrix[target] then return
 		if targets.length == 0
 			target = ''
 			return
@@ -114,6 +117,17 @@ destinationPoint = (lat, lon, distance, bearing) ->
 	lat: φ2 * 180 / Math.PI
 	lon: λ2 * 180 / Math.PI
 
+initSounds = ->
+	sounds = {}
+	for name in "soundDown soundUp".split ' '
+		sound = loadSound "sounds/#{name}.wav"
+		sound.setVolume 1.0
+		sound.pan 0
+		sounds[name] = sound
+
+window.preload = ->
+	initSounds()
+
 window.setup = ->
 	createCanvas windowWidth-10, windowHeight-10, document.getElementById "canvas"
 	textAlign CENTER,CENTER
@@ -132,7 +146,7 @@ window.setup = ->
 			grid[key] = [50 + 100*i, 50 + 100*j]
 
 	targets = _.keys matrix
-	targets = 'h1 h2 g1 f1 g2 h3 h4 g3 f2 e1 e2 f3 g4 f4 e3 e4 s p'.split ' '
+	targets = 's p h1 h2 g1 f1 g2 h3 h4 g3 f2 e1 e2 f3 g4 f4 e3 e4'.split ' '
 	# targets = _.shuffle targets
 	echo targets
 	target = 's'
@@ -152,8 +166,6 @@ window.setup = ->
 	# assert 108, round bearingBetween matrix.a4, matrix.d3
 	# assert 214, round bearingBetween matrix.c4, matrix.a1
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
-	
-
 
 window.draw = ->
 	background 0
@@ -162,7 +174,7 @@ window.draw = ->
 
 	stroke 255
 	[px,py] = grid.p
-	[tx,ty] = grid[target]	
+	[tx,ty] = grid[target]
 	line 50+px, 50-py, 50+tx, 50+ty
 	noStroke()
 
@@ -191,10 +203,12 @@ window.draw = ->
 	textAlign "left"
 	textSize 20
 	for i in range messages.length
-		text messages[i], 450,15+i*20
+		text messages[i], 10, 550 + i*20
 	pop()
 
-	
+window.touchStarted = ->
+	sounds.soundDown.play()
+
 
 
 
