@@ -1,4 +1,4 @@
-VERSION = 12
+VERSION = 13
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -35,11 +35,11 @@ startTracking = ->
 
 	watchID = navigator.geolocation.watchPosition (p) ->
 		gpsCount += 1
-		#matrix.p.lat = p.coords.latitude
-		#matrix.p.lon = p.coords.longitude
-		#grid.p = makePoint matrix.s, matrix.p
+		matrix.p.lat = p.coords.latitude
+		matrix.p.lon = p.coords.longitude
+		grid.p = makePoint matrix.s, matrix.p
 		# dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
-		document.querySelector('#status').textContent = "#{gpsCount}"  #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
+		document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
 		return 
 		# om man är högst 5 meter från målet, byt mål
 		if target == '' then return
