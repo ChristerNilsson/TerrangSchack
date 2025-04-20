@@ -1,4 +1,4 @@
-VERSION = 13
+VERSION = 14
 SIZE = 100 # meter
 
 FILES = 'efgh'
@@ -38,7 +38,7 @@ startTracking = ->
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
 		grid.p = makePoint matrix.s, matrix.p
-		# dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 		document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
 		return 
 		# om man är högst 5 meter från målet, byt mål
