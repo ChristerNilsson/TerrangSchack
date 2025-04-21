@@ -1,4 +1,4 @@
-VERSION = 21
+VERSION = 22
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -29,7 +29,25 @@ assert = (a,b) -> if a != b then echo 'assert',a,b
 watchID = null
 gpsCount = 0
 
-errFunction = (err) -> document.querySelector('#status').textContent = "Fel: #{err.message}"
+wp = (p) =>
+	gpsCount += 1
+	matrix.p.lat = p.coords.latitude
+	matrix.p.lon = p.coords.longitude
+	grid.p = makePoint matrix.s, matrix.p
+	# grid.p[1] = -grid.p[1]
+	dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+	document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
+
+	# om man är inom RADIUS meter från målet, byt mål
+	if target == '' then return
+	if RADIUS < distanceBetween matrix.p, matrix[target] then return
+	if targets.length == 0
+		target = ''
+		return
+	sounds.soundDown.play()
+	target = targets.pop()
+
+wperr = (err) -> document.querySelector('#status').textContent = "Fel: #{err.message}"
 
 startTracking = ->
 	if not navigator.geolocation
@@ -38,28 +56,9 @@ startTracking = ->
 
 	document.querySelector('#status').textContent = "Begär platsdata..."
 
-	watchID = navigator.geolocation.watchPosition (p) =>
-		gpsCount += 1
-		matrix.p.lat = p.coords.latitude
-		matrix.p.lon = p.coords.longitude
-		grid.p = makePoint matrix.s, matrix.p
-		# grid.p[1] = -grid.p[1]
-		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
-		document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
-
-		# om man är inom RADIUS meter från målet, byt mål
-		if target == '' then return
-		if RADIUS < distanceBetween matrix.p, matrix[target] then return
-		if targets.length == 0
-			target = ''
-			return
-		sounds.soundDown.play()
-		target = targets.pop()
-
-	, errFunction
-	,
-		enableHighAccuracy: true
-		timeout: 5000
+	watchID = navigator.geolocation.watchPosition wp, wperr,
+		enableHighAccuracy: true 
+		timeout: 5000 
 		maximumAge: 1000
 
 document.querySelector('#startBtn').addEventListener 'click', startTracking
