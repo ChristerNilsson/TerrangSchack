@@ -1,4 +1,4 @@
-VERSION = 20
+VERSION = 21
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
