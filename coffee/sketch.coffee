@@ -1,4 +1,4 @@
-VERSION = 26
+VERSION = 27
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -48,6 +48,8 @@ wp = (p) =>
 
 wperr = (err) -> dump "Fel: #{err.message}"
 
+window.touchStarted = -> startTracking()
+
 startTracking = ->
 	if not navigator.geolocation
 		dump "Geolocation stöds inte i din webbläsare."
@@ -60,7 +62,7 @@ startTracking = ->
 		timeout: 5000 
 		maximumAge: 1000
 
-document.querySelector('#startBtn').addEventListener 'click', startTracking
+# document.querySelector('#startBtn').addEventListener 'click', startTracking
 
 distanceBetween = (p,q) ->
 	lat1 = p.lat
@@ -203,9 +205,6 @@ window.draw = ->
 	for i in range messages.length
 		text messages[i], 10, 550 + i*20
 	pop()
-
-# window.touchStarted = ->
-# 	sounds.soundDown.play()
 
 
 
