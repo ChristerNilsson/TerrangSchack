@@ -1,4 +1,4 @@
-VERSION = 22
+VERSION = 23
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -35,8 +35,8 @@ wp = (p) =>
 	matrix.p.lon = p.coords.longitude
 	grid.p = makePoint matrix.s, matrix.p
 	# grid.p[1] = -grid.p[1]
-	dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
-	document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
+	dump "#{gpsCount} #{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+	# document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
@@ -47,7 +47,7 @@ wp = (p) =>
 	sounds.soundDown.play()
 	target = targets.pop()
 
-wperr = (err) -> document.querySelector('#status').textContent = "Fel: #{err.message}"
+wperr = (err) -> dump "Fel: #{err.message}"
 
 startTracking = ->
 	if not navigator.geolocation
