@@ -35,7 +35,7 @@ wp = (p) =>
 	matrix.p.lon = p.coords.longitude
 	grid.p = makePoint matrix.s, matrix.p
 	# grid.p[1] = -grid.p[1]
-	dump "#{gpsCount}  #{round bearingBetween matrix.p, matrix[target]} #{target} #{round distanceBetween(matrix.p, matrix[target]), 1} #{round p.coords.latitude,6} #{round p.coords.longitude,6} " # dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+	dump "#{gpsCount}  #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target]), 1}m #{round p.coords.latitude,6} #{round p.coords.longitude,6} " # dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
