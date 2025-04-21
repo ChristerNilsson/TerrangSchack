@@ -1,4 +1,4 @@
-VERSION = 23
+VERSION = 24
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -36,7 +36,6 @@ wp = (p) =>
 	grid.p = makePoint matrix.s, matrix.p
 	# grid.p[1] = -grid.p[1]
 	dump "#{gpsCount} #{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
-	# document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
@@ -51,10 +50,10 @@ wperr = (err) -> dump "Fel: #{err.message}"
 
 startTracking = ->
 	if not navigator.geolocation
-		document.querySelector('#status').textContent = "Geolocation stöds inte i din webbläsare."
+		dump "Geolocation stöds inte i din webbläsare."
 		return
 
-	document.querySelector('#status').textContent = "Begär platsdata..."
+	dump "Begär platsdata..."
 
 	watchID = navigator.geolocation.watchPosition wp, wperr,
 		enableHighAccuracy: true 
