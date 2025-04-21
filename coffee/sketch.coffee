@@ -206,8 +206,8 @@ window.draw = ->
 		text messages[i], 10, 550 + i*20
 	pop()
 
-window.touchStarted = ->
-	sounds.soundDown.play()
+# window.touchStarted = ->
+# 	sounds.soundDown.play()
 
 
 
