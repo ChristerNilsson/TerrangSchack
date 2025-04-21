@@ -1,8 +1,8 @@
 VERSION = 20
-SIZE = 100 # meter
+SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
-FILES = 'efgh'
+FILES = 'efgh' # De 16 rutor man har hand om
 RANKS = '4321'
 
 R = 6371e3  # Jordens radie i meter
@@ -21,8 +21,8 @@ echo = console.log
 range = _.range
 
 dump = (msg) ->
-	messages.push msg
-	if messages.length > 20 then messages.shift()
+	messages.unshift msg # nyaste överst
+	if messages.length > 20 then messages.pop() # äldsta droppas
 
 assert = (a,b) -> if a != b then echo 'assert',a,b
 
@@ -43,7 +43,6 @@ startTracking = ->
 		matrix.p.lat = p.coords.latitude
 		matrix.p.lon = p.coords.longitude
 		grid.p = makePoint matrix.s, matrix.p
-		sounds.soundDown.play()
 		# grid.p[1] = -grid.p[1]
 		dump "#{target} #{round p.coords.latitude,4} #{round p.coords.longitude,4} #{round distanceBetween matrix.p, matrix[target]} #{round bearingBetween matrix.p, matrix[target]} dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
 		document.querySelector('#status').textContent = "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]} #{round distanceBetween matrix.p, matrix[target]}"
@@ -54,6 +53,7 @@ startTracking = ->
 		if targets.length == 0
 			target = ''
 			return
+		sounds.soundDown.play()
 		target = targets.pop()
 
 	, errFunction
