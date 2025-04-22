@@ -1,4 +1,4 @@
-VERSION = 42
+VERSION = 43
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
@@ -170,7 +170,7 @@ window.setup = ->
 	lat = (matrix.f3.lat + matrix.g2.lat) / 2
 	lon = (matrix.f3.lon + matrix.g2.lon) / 2
 	matrix.p = {lat, lon}
-	grid_pixel.p = [2*SIZE_PIXEL,-(-2*SIZE_PIXEL)]
+	grid_pixel.p = [2*SIZE_PIXEL, 2*SIZE_PIXEL]
 	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
 	dump 'Version: ' + VERSION
@@ -194,7 +194,7 @@ window.draw = ->
 	stroke 255
 	[px,py] = grid_pixel.p
 	[tx,ty] = grid_pixel[target]
-	line 10 + px, 10 - -py, 10 + tx, 10 + ty
+	line 10 + px, 10 + py, 10 + tx, 10 + ty
 	noStroke()
 
 	for key of grid_pixel
@@ -203,7 +203,7 @@ window.draw = ->
 		if key == target then fill 'red'
 		if key == 'p'
 			fill 'yellow'
-			circle 10 + x, 10 - -y, 0.1 * SIZE_PIXEL
+			circle 10 + x, 10 + y, 0.1 * SIZE_PIXEL
 		else
 			circle 10 + x, 10 + y, 0.1 * SIZE_PIXEL
 
