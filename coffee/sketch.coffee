@@ -4,7 +4,7 @@ START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brot
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
 SIZE_METER = 100 # En schackrutas storlek i meter
 
-RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
+RADIUS = 2 # meter. Maxavstånd mellan spelaren och target
 
 FILES = 'efgh' # De 16 rutor man har hand om
 RANKS = '4321'
