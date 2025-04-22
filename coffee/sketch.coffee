@@ -1,4 +1,4 @@
-VERSION = 30
+VERSION = 31
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -51,11 +51,11 @@ wp = (p) =>
 wperr = (err) -> dump "Fel: #{err.message}"
 
 window.touchStarted = ->
-	sounds.soundDown.play()
 	if not started
 		userStartAudio()
 		startTracking()
 		started = true
+	sounds.soundDown.play()
 	return false
 
 startTracking = ->
