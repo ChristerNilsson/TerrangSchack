@@ -1,4 +1,4 @@
-VERSION = 37
+VERSION = 38
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
@@ -214,8 +214,8 @@ window.draw = ->
 
 	fill 'green'
 	for i in [0...4]
-		text FILES[i], 10 + SP2 + i*SIZE_PIXEL, 10 + 0.25*SIZE_PIXEL
-		text RANKS[i], 10 + SP2/2, 10 + SP2 + i*SIZE_PIXEL
+		text FILES[i], 10 + SP2 + i*SIZE_PIXEL, 10 + 0.25 * SIZE_PIXEL
+		text RANKS[i], 10 + SP2/2,              10 + SP2 + i*SIZE_PIXEL
 
 	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,3.9*SIZE_PIXEL
 	text target, 10+2*SIZE_PIXEL, 3.9*SIZE_PIXEL
