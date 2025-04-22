@@ -1,4 +1,4 @@
-VERSION = 33
+VERSION = 34
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
@@ -144,7 +144,7 @@ window.preload = ->
 window.setup = ->
 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
 	textAlign CENTER,CENTER
-	textSize 40
+	textSize 0.3 * SIZE_PIXEL
 	noStroke()
 	frameRate 2
 
@@ -211,15 +211,15 @@ window.draw = ->
 		text FILES[i], 10 + SP2 + i*SIZE_PIXEL, 10 + 0.25*SIZE_PIXEL
 		text RANKS[i], 10 + SP2/2, 10 + SP2 + i*SIZE_PIXEL
 
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,4*SIZE_PIXEL
-	text target, 10+2*SIZE_PIXEL, 4*SIZE_PIXEL
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',10+3.5*SIZE_PIXEL,4*SIZE_PIXEL
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,3.9*SIZE_PIXEL
+	text target, 10+2*SIZE_PIXEL, 3.9*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',10+3.5*SIZE_PIXEL,3.9*SIZE_PIXEL
 
 	push()
 	textAlign "left"
-	textSize 20
+	textSize 0.2 * SIZE_PIXEL
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 4.2*SIZE_PIXEL + i*20
+		text messages[i], 0.1*SIZE_PIXEL, 4.2*SIZE_PIXEL + i*0.2 * SIZE_PIXEL
 	pop()
 
 
