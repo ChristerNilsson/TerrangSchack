@@ -1,5 +1,9 @@
-VERSION = 32
-SIZE = 100 # meter. En schackrutas storlek
+VERSION = 33
+
+START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
+SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
+SIZE_METER = 100 # En schackrutas storlek i meter
+
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
 FILES = 'efgh' # De 16 rutor man har hand om
@@ -138,7 +142,7 @@ window.preload = ->
 	initSounds()
 
 window.setup = ->
-	createCanvas windowWidth-10, windowHeight-10, document.getElementById "canvas"
+	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
 	textAlign CENTER,CENTER
 	textSize 40
 	noStroke()
@@ -146,15 +150,15 @@ window.setup = ->
 
 	# sounds.soundUp.play()
 
-	matrix.s = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
-	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
+	matrix.s = START_POINT 
+	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5) * SIZE_METER, 90 for i in [0...4])
 	# echo arr
 
 	for i in [0...4]
 		for j in [0...4]
 			key = "#{FILES[i]}#{RANKS[j]}"
-			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j+0.5)*SIZE, 180
-			grid[key] = [50 + 100*i, 50 + 100*j]
+			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j+0.5) * SIZE_METER, 180
+			grid[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
 
 	targets = _.keys matrix
 	targets = 'h1 g1 f1 e1 e2 f2 g2 h2 h3 g3 f3 e3 e4 f4 g4 h4 s p'.split ' '
@@ -166,7 +170,9 @@ window.setup = ->
 	lat = (matrix.f3.lat + matrix.g2.lat) / 2
 	lon = (matrix.f3.lon + matrix.g2.lon) / 2
 	matrix.p = {lat, lon}
-	grid.p = [200,-200]
+	grid.p = [2*SIZE_PIXEL,-2*SIZE_PIXEL]
+
+	dump 'Version: ' + VERSION
 
 	echo 'matrix',matrix
 	echo 'grid',grid
@@ -181,12 +187,12 @@ window.setup = ->
 window.draw = ->
 	background 0
 	fill 255
-	scale 2
-
+	# scale 2
+	SP2 = SIZE_PIXEL/2
 	stroke 255
 	[px,py] = grid.p
 	[tx,ty] = grid[target]
-	line 50+px, 50-py, 50+tx, 50+ty
+	line 10 + px, 10 - py, 10 + tx, 10 + ty
 	noStroke()
 
 	for key of grid
@@ -195,26 +201,25 @@ window.draw = ->
 		if key == target then fill 'red'
 		if key == 'p'
 			fill 'yellow'
-			circle 50+x, 50-y, 10
+			circle 10 + x, 10 - y, 0.1 * SP2
 		else
 			# text key, 50+x, 50+y
-			circle 50+x, 50+y, 10
+			circle 10 + x, 10 + y, 0.1 * SP2
 
 	fill 'green'
 	for i in [0...4]
-		text FILES[i], 100+i*100,450
-		text RANKS[i], 50, 100+i*100
+		text FILES[i], 10 + SP2 + i*SIZE_PIXEL, 10 + 0.25*SIZE_PIXEL
+		text RANKS[i], 10 + SP2/2, 10 + SP2 + i*SIZE_PIXEL
 
-	text 'Ver: ' + VERSION,250,50
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',100,500
-	text target, 250,500
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',400,500
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,4*SIZE_PIXEL
+	text target, 10+2*SIZE_PIXEL, 4*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',10+3.5*SIZE_PIXEL,4*SIZE_PIXEL
 
 	push()
 	textAlign "left"
 	textSize 20
 	for i in range messages.length
-		text messages[i], 10, 550 + i*20
+		text messages[i], 0.1*SIZE_PIXEL, 4.2*SIZE_PIXEL + i*20
 	pop()
 
 
