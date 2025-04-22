@@ -1,4 +1,4 @@
-VERSION = 35
+VERSION = 36
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
