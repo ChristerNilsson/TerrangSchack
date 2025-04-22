@@ -1,4 +1,4 @@
-VERSION = 28
+VERSION = 29
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -175,7 +175,7 @@ window.setup = ->
 window.draw = ->
 	background 0
 	fill 255
-	#scale 1.8
+	scale 2
 
 	stroke 255
 	[px,py] = grid.p
