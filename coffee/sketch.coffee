@@ -1,4 +1,4 @@
-VERSION = 29
+VERSION = 30
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -12,6 +12,7 @@ target = ""
 
 messages = []
 sounds = {}
+started = false
 
 matrix = {} # WGS84
 grid = {} # meter
@@ -49,11 +50,16 @@ wp = (p) =>
 
 wperr = (err) -> dump "Fel: #{err.message}"
 
-window.touchStarted = -> startTracking()
+window.touchStarted = ->
+	sounds.soundDown.play()
+	if not started
+		userStartAudio()
+		startTracking()
+		started = true
+	return false
 
 startTracking = ->
 
-	sounds.soundDown.play()
 	if not navigator.geolocation
 		dump "Geolocation stöds inte i din webbläsare."
 		return
@@ -138,7 +144,7 @@ window.setup = ->
 	noStroke()
 	frameRate 2
 
-	sounds.soundUp.play()
+	# sounds.soundUp.play()
 
 	matrix.s = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
