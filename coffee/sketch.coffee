@@ -1,4 +1,4 @@
-VERSION = 27
+VERSION = 28
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -30,6 +30,7 @@ watchID = null
 gpsCount = 0
 
 wp = (p) =>
+	sounds.soundDown.play()
 	gpsCount += 1
 	matrix.p.lat = p.coords.latitude
 	matrix.p.lon = p.coords.longitude
@@ -44,13 +45,15 @@ wp = (p) =>
 		target = ''
 		return
 	sounds.soundDown.play()
-	target = targets.pop()
+	target = targets.shift()
 
 wperr = (err) -> dump "Fel: #{err.message}"
 
 window.touchStarted = -> startTracking()
 
 startTracking = ->
+
+	sounds.soundDown.play()
 	if not navigator.geolocation
 		dump "Geolocation stöds inte i din webbläsare."
 		return
@@ -135,6 +138,8 @@ window.setup = ->
 	noStroke()
 	frameRate 2
 
+	sounds.soundUp.play()
+
 	matrix.s = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5)*SIZE, 90 for i in [0...4])
 	# echo arr
@@ -146,10 +151,10 @@ window.setup = ->
 			grid[key] = [50 + 100*i, 50 + 100*j]
 
 	targets = _.keys matrix
-	targets = 's p h1 h2 g1 f1 g2 h3 h4 g3 f2 e1 e2 f3 g4 f4 e3 e4'.split ' '
+	targets = 'h1 g1 f1 e1 e2 f2 g2 h2 h3 g3 f3 e3 e4 f4 g4 h4 s p'.split ' '
 	# targets = _.shuffle targets
 	echo targets
-	target = 's'
+	target = targets.shift()
 
 	# kvadrantens mittpunkt
 	lat = (matrix.f3.lat + matrix.g2.lat) / 2
