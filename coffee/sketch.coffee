@@ -1,4 +1,4 @@
-VERSION = 38
+VERSION = 39
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
@@ -207,10 +207,10 @@ window.draw = ->
 		if key == target then fill 'red'
 		if key == 'p'
 			fill 'yellow'
-			circle 10 + x, 10 - y, 0.1 * SP2
+			circle 10 + x, 10 - y, 0.1 * SIZE_PIXEL
 		else
 			# text key, 50+x, 50+y
-			circle 10 + x, 10 + y, 0.1 * SP2
+			circle 10 + x, 10 + y, 0.1 * SIZE_PIXEL
 
 	fill 'green'
 	for i in [0...4]
