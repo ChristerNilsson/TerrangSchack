@@ -79,8 +79,6 @@ startTracking = ->
 		timeout: 5000 
 		maximumAge: 1000
 
-# document.querySelector('#startBtn').addEventListener 'click', startTracking
-
 distanceBetween = (p,q) ->
 	lat1 = p.lat
 	lon1 = p.lon
@@ -152,11 +150,8 @@ window.setup = ->
 	noStroke()
 	frameRate 2
 
-	# sounds.soundUp.play()
-
 	matrix.s = START_POINT 
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5) * SIZE_METER, 90 for i in [0...4])
-	# echo arr
 
 	for i in [0...4]
 		for j in [0...4]
@@ -210,7 +205,6 @@ window.draw = ->
 			fill 'yellow'
 			circle 10 + x, 10 - -y, 0.1 * SIZE_PIXEL
 		else
-			# text key, 50+x, 50+y
 			circle 10 + x, 10 + y, 0.1 * SIZE_PIXEL
 
 	fill 'green'
