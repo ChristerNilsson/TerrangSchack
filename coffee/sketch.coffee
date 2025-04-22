@@ -1,4 +1,4 @@
-VERSION = 31
+VERSION = 32
 SIZE = 100 # meter. En schackrutas storlek
 RADIUS = 3 # meter. Maxavstånd mellan spelaren och target
 
@@ -31,7 +31,7 @@ watchID = null
 gpsCount = 0
 
 wp = (p) =>
-	sounds.soundDown.play()
+	#sounds.soundDown.play()
 	gpsCount += 1
 	matrix.p.lat = p.coords.latitude
 	matrix.p.lon = p.coords.longitude
@@ -45,7 +45,7 @@ wp = (p) =>
 	if targets.length == 0
 		target = ''
 		return
-	sounds.soundDown.play()
+	# sounds.soundDown.play()
 	target = targets.shift()
 
 wperr = (err) -> dump "Fel: #{err.message}"
