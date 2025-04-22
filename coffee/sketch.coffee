@@ -1,8 +1,9 @@
-VERSION = 36
+VERSION = 37
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
 SIZE_METER = 50 # En schackrutas storlek i meter
+FACTOR = SIZE_PIXEL / SIZE_METER
 
 RADIUS = 2 # meter. Maxavstånd mellan spelaren och target
 
@@ -19,8 +20,10 @@ sounds = {}
 started = false
 
 matrix = {} # WGS84
-grid = {} # meter
-grid.s = [0,0] # origo, samlingspunkt
+grid_meter = {} # meter
+grid_pixel = {} # pixel
+grid_meter.s = [0,0] # origo, samlingspunkt
+grid_pixel.s = [0,0] # origo, samlingspunkt
 
 echo = console.log
 range = _.range
@@ -39,9 +42,9 @@ wp = (p) =>
 	gpsCount += 1
 	matrix.p.lat = p.coords.latitude
 	matrix.p.lon = p.coords.longitude
-	grid.p = makePoint matrix.s, matrix.p
-	# grid.p[1] = -grid.p[1]
-	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target]),1}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" # dx=#{round grid.p[0]} dy=#{round grid.p[1]}"
+	grid_meter.p = makePoint matrix.s, matrix.p
+	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
+	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target]),1}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" 
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
@@ -158,7 +161,8 @@ window.setup = ->
 		for j in [0...4]
 			key = "#{FILES[i]}#{RANKS[j]}"
 			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j+0.5) * SIZE_METER, 180
-			grid[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
+			grid_pixel[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
+			grid_meter[key] = [(i+0.5) * SIZE_METER, (j+0.5) * SIZE_METER]
 
 	targets = _.keys matrix
 	targets = 'h1 g1 f1 e1 e2 f2 g2 h2 h3 g3 f3 e3 e4 f4 g4 h4 s p'.split ' '
@@ -170,12 +174,14 @@ window.setup = ->
 	lat = (matrix.f3.lat + matrix.g2.lat) / 2
 	lon = (matrix.f3.lon + matrix.g2.lon) / 2
 	matrix.p = {lat, lon}
-	grid.p = [2*SIZE_PIXEL,-2*SIZE_PIXEL]
+	grid_pixel.p = [2*SIZE_PIXEL,-2*SIZE_PIXEL]
+	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
 	dump 'Version: ' + VERSION
 
 	echo 'matrix',matrix
-	echo 'grid',grid
+	echo 'grid_meter',grid_meter
+	echo 'grid_pixel',grid_pixel
 
 	# assert 224, round distanceBetween matrix.c1, matrix.d3
 	# assert  27, round bearingBetween matrix.c1, matrix.d3
@@ -190,13 +196,13 @@ window.draw = ->
 	# scale 2
 	SP2 = SIZE_PIXEL/2
 	stroke 255
-	[px,py] = grid.p
-	[tx,ty] = grid[target]
+	[px,py] = grid_pixel.p
+	[tx,ty] = grid_pixel[target]
 	line 10 + px, 10 - py, 10 + tx, 10 + ty
 	noStroke()
 
-	for key of grid
-		[x,y] = grid[key]
+	for key of grid_pixel
+		[x,y] = grid_pixel[key]
 		fill 'white'
 		if key == target then fill 'red'
 		if key == 'p'
