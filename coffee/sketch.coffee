@@ -1,9 +1,9 @@
-VERSION = 40
+VERSION = 41
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
 SIZE_METER = 50 # En schackrutas storlek i meter
-RADIUS = 2 # meter. Maxavstånd mellan spelaren och target
+RADIUS = 1 # meter. Maxavstånd mellan spelaren och target
 R = 6371e3  # Jordens radie i meter
 
 #################
@@ -218,15 +218,18 @@ window.draw = ->
 		text FILES[i], 10 + SP2 + i*SIZE_PIXEL, 10 + 0.25 * SIZE_PIXEL
 		text RANKS[i], 10 + SP2/2,              10 + SP2 + i*SIZE_PIXEL
 
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,3.9*SIZE_PIXEL
-	text target, 10+2*SIZE_PIXEL, 3.9*SIZE_PIXEL
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',10+3.5*SIZE_PIXEL,3.9*SIZE_PIXEL
+	push()
+	textSize 0.5 * SIZE_PIXEL
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,4.1*SIZE_PIXEL
+	text target, 10+2*SIZE_PIXEL, 4.1*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',10+3.5*SIZE_PIXEL,4.1*SIZE_PIXEL
+	pop()
 
 	push()
 	textAlign "left"
 	textSize 0.2 * SIZE_PIXEL
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 4.2*SIZE_PIXEL + i*0.2 * SIZE_PIXEL
+		text messages[i], 0.1*SIZE_PIXEL, 4.5*SIZE_PIXEL + i*0.2 * SIZE_PIXEL
 	pop()
 
 
