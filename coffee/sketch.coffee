@@ -1,4 +1,4 @@
-VERSION = 34
+VERSION = 35
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
@@ -49,7 +49,7 @@ wp = (p) =>
 	if targets.length == 0
 		target = ''
 		return
-	# sounds.soundDown.play()
+	sounds.soundDown.play()
 	target = targets.shift()
 
 wperr = (err) -> dump "Fel: #{err.message}"
