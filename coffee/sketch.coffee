@@ -2,7 +2,7 @@ VERSION = 43
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
-SIZE_METER = 50 # En schackrutas storlek i meter
+SIZE_METER = 10 # En schackrutas storlek i meter
 RADIUS = 1 # meter. Maxavstånd mellan spelaren och target
 R = 6371e3  # Jordens radie i meter
 
