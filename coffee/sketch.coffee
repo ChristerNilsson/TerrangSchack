@@ -1,4 +1,4 @@
-VERSION = 46
+VERSION = 47
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
@@ -278,7 +278,7 @@ window.setup = ->
 	grid_pixel.p = [2*SIZE_PIXEL, 2*SIZE_PIXEL]
 	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
-	dump 'Version: ' + VERSION
+	dump "Version: #{VERSION} Size: #{SIZE_METER}m Radius: #{RADIUS}m" 
 
 	echo 'matrix',matrix
 	echo 'grid_meter',grid_meter
