@@ -1,10 +1,14 @@
-VERSION = 44
+VERSION = 45
 
 START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
-RADIUS = 1 # meter. Maxavstånd mellan spelaren och target
+RADIUS = 0.5 # meter. Maxavstånd mellan spelaren och target
+TIME = [90,30] # base in minutes, increment in seconds
 R = 6371e3  # Jordens radie i meter
+
+BEARINGLIST ='01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'.split ' '
+DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 160 180 200 250 300 350 400 450 500 600 700 800 900 1000 1200 1400 1600 1800 2000 2500 3000 3500 4000 4500 5000 6000 7000 8000 9000'.split ' '
 
 #################
 
@@ -37,6 +41,88 @@ assert = (a,b) -> if a != b then echo 'assert',a,b
 
 watchID = null
 gpsCount = 0
+
+
+closestDistance = (m) =>
+	bestDist = 999999
+	bestValue = 0
+	for d in DISTLIST
+		if abs(m-d) < bestDist
+			bestDist = abs m-d
+			bestValue = d
+	bestValue
+
+sayDist = (m) -> # m är en distans, eventuellt i DISTLIST
+	dump.store ""
+	dump.store "sayDistance #{m} #{JSON.stringify distanceQ}"
+	m = closestDistance m
+	console.log m,'started'
+	distanceSounds[m].play()
+	# distanceSounds[m].onended () => console.log m, "ended"
+
+sayDistance = (a,b) -> # a is newer (meter)
+	# if a border is crossed, produce a distance
+	dump.store "D #{round a,1} #{round b,1}"
+	a = round a
+	b = round b
+	if b == -1 then return a
+	for d in DISTLIST
+		d = parseInt d
+		if a == d and b != d then return d
+		if (a-d) * (b-d) < 0 then return d
+	""
+
+decreaseQueue = ->
+	console.log 'decreaseQueue',bearingQ,distanceQ
+	if bearingQ.length == 0
+		if distanceQ.length == 0
+			return
+		else
+			console.log 'distance',distanceQ
+			msg = _.last distanceQ # latest
+			distanceQ.clear() # ignore the rest
+			#arr = msg.split ' '
+			if general.DISTANCE or msg < LIMIT
+				distance = msg
+				#errors.push "distance #{msg}"
+				if distanceSaid != distance then sayDist distance
+				distanceSaid = distance
+	else
+		console.log 'bearing',bearingQ
+		msg = _.last bearingQ # latest
+		#errors.push "bearing #{msg}"
+		bearingQ.clear() # ignore the rest
+		if msg in BEARINGLIST
+			bearingSounds[msg].play()
+
+
+increaseQueue = (p) ->
+
+	# if crossHair == null then return
+
+	# [trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
+
+	# a = LatLon p.coords.latitude, p.coords.longitude # newest
+	# b = LatLon gpsLat, gpsLon
+	# c = LatLon trgLat, trgLon # target
+	
+	# distac = a.distanceTo c # meters
+	# distbc = b.distanceTo c
+	# distance = (distac - distbc)/DIST
+
+	bearingac = a.bearingTo c
+	#bearingbc = b.bearingTo c
+	if distac >= LIMIT then bearing.update bearingac # sayBearing bearingac,bearingbc else ""
+
+	sDistance = sayDistance distac,distbc
+	if sDistance != "" then distanceQ.push sDistance # Vi kan inte säga godtyckligt avstånd numera
+
+	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
+		gpsLat = round p.coords.latitude,6
+		gpsLon = round p.coords.longitude,6
+
+
+
 
 wp = (p) =>
 	#sounds.soundDown.play()
@@ -140,6 +226,25 @@ initSounds = ->
 		sound.pan 0
 		sounds[name] = sound
 
+# locationUpdate = (p) ->
+# 	reason = 0
+# 	try
+# 		pLat = round p.coords.latitude,6
+# 		pLon = round p.coords.longitude,6
+# 		# if storage.trail.length == 0
+# 		# 	gpsLat = pLat
+# 		# 	gpsLon = pLon
+# 		# messages[5] = gpsCount++
+# 		decreaseQueue()
+# 		# reason = 1
+# 		increaseQueue p # meters
+# 		# reason = 2
+# 		# uppdatera pLat, pLon
+# 		# reason = 3
+# 	catch error
+# 		dump error
+# 		dump reason
+
 window.preload = ->
 	initSounds()
 
@@ -216,7 +321,7 @@ window.draw = ->
 	textSize 0.5 * SIZE_PIXEL
 	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,4.1*SIZE_PIXEL
 	text target, 10+2*SIZE_PIXEL, 4.1*SIZE_PIXEL
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',10+3.5*SIZE_PIXEL,4.1*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target]),2) + 'm',10+3.5*SIZE_PIXEL,4.1*SIZE_PIXEL
 	pop()
 
 	push()
