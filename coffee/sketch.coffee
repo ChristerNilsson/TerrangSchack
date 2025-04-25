@@ -1,4 +1,4 @@
-VERSION = 64
+VERSION = 65
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -299,7 +299,7 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
-	OS = RADIUS_PIXEL #10 # offset
+	OS = 2*RADIUS_PIXEL #10 # offset
 	background 0
 	# noFill() # 255
 	SP2 = SIZE_PIXEL/2
@@ -338,11 +338,11 @@ window.draw = ->
 	fill 'yellow'
 	textSize 2*0.03 * height
 	textAlign 'left'
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,8.2*SIZE_PIXEL
+	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0, 8.2*SIZE_PIXEL
 	textAlign 'center'
 	text target, 0.5*width, 8.2*SIZE_PIXEL
 	textAlign 'right'
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',width,8.2*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm', width, 8.2*SIZE_PIXEL
 	pop()
 
 	push()
