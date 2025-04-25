@@ -1,6 +1,8 @@
-VERSION = 47
+VERSION = 48
 
-START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
+# START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
+START_POINT = lat : 59.266338, lon = 18.131969 # Brandparken
+
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
 RADIUS = 0.5 # meter. Maxavstånd mellan spelaren och target
@@ -266,7 +268,7 @@ window.setup = ->
 			grid_meter[key] = [(i+0.5) * SIZE_METER, (j+0.5) * SIZE_METER]
 
 	targets = _.keys matrix
-	targets = 'h1 g1 f1 e1 e2 f2 g2 h2 h3 g3 f3 e3 e4 f4 g4 h4 s p'.split ' '
+	targets = 's h1 g1 f1 e1 e2 f2 g2 h2 h3 g3 f3 e3 e4 f4 g4 h4 p'.split ' '
 	# targets = _.shuffle targets
 	echo targets
 	target = targets.shift()
