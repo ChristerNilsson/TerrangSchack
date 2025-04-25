@@ -1,4 +1,4 @@
-VERSION = 63
+VERSION = 64
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -340,9 +340,9 @@ window.draw = ->
 	textAlign 'left'
 	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,8.2*SIZE_PIXEL
 	textAlign 'center'
-	text target, OS+3.6*SIZE_PIXEL, 8.2*SIZE_PIXEL
+	text target, 0.5*width, 8.2*SIZE_PIXEL
 	textAlign 'right'
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',OS+7.2*SIZE_PIXEL,8.2*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',width,8.2*SIZE_PIXEL
 	pop()
 
 	push()
@@ -350,7 +350,7 @@ window.draw = ->
 	textAlign "left"
 	textSize 0.036 * height
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 9*SIZE_PIXEL + i * 0.04 * height
+		text messages[i], 0.0*SIZE_PIXEL, 9*SIZE_PIXEL + i * 0.04 * height
 	pop()
 
 
