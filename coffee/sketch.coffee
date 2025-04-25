@@ -5,7 +5,7 @@ START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
 
 SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
-RADIUS = 0.5 # meter. Maxavstånd mellan spelaren och target
+RADIUS = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 TIME = [90,30] # base in minutes, increment in seconds
 R = 6371e3  # Jordens radie i meter
 
@@ -280,7 +280,7 @@ window.setup = ->
 	grid_pixel.p = [2*SIZE_PIXEL, 2*SIZE_PIXEL]
 	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
-	dump "Version: #{VERSION} Size: #{SIZE_METER}m Radius: #{RADIUS}m" 
+	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS}m #{START_POINT.lat} #{START_POINT.lon}"  
 
 	echo 'matrix',matrix
 	echo 'grid_meter',grid_meter
