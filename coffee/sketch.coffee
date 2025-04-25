@@ -1,4 +1,4 @@
-VERSION = 49
+VERSION = 50
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
