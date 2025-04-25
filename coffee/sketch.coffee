@@ -1,4 +1,4 @@
-VERSION = 50
+VERSION = 51
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -133,7 +133,7 @@ wp = (p) =>
 	matrix.p.lon = p.coords.longitude
 	grid_meter.p = makePoint matrix.s, matrix.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
-	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target]),2}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" 
+	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target]),2}m #{round p.coords.latitude,6} #{round p.coords.longitude,6} #{p.coords.accuracy}" 
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
