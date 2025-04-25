@@ -1,8 +1,8 @@
-VERSION = 66
+VERSION = 67
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
-START_POINT = lat : 59.270294, lon : 18.130309 # Kaninparken
+START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 
 SIZE_PIXEL = 100 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
