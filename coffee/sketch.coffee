@@ -299,11 +299,9 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
-	OX = (width - 7*SIZE_PIXEL - 2*RADIUS_PIXEL)2 #10 # offset
-	OY = 2*RADIUS_PIXEL
+	OX = (width - 7*SIZE_PIXEL - 2*RADIUS_PIXEL) / 2 # offset x
+	OY = 2*RADIUS_PIXEL # offset y
 	background 0
-	# noFill() # 255
-	SP2 = SIZE_PIXEL/2
 
 	stroke 'white'
 	strokeWeight 2
