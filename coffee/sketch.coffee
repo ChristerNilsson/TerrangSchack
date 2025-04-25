@@ -1,4 +1,4 @@
-VERSION = 58
+VERSION = 59
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -302,7 +302,6 @@ window.draw = ->
 	OS = RADIUS_PIXEL #10 # offset
 	background 0
 	# noFill() # 255
-	# scale 2
 	SP2 = SIZE_PIXEL/2
 
 	stroke 'white'
@@ -320,17 +319,18 @@ window.draw = ->
 		if key == target then stroke 'red'
 		if key == 'p'
 			stroke 'yellow'
-			circle OS + x, OS + y, RADIUS_PIXEL
+			circle OS + x, OS + y, 2*RADIUS_PIXEL
 		else
-			circle OS + x, OS + y, RADIUS_PIXEL
+			circle OS + x, OS + y, 2*RADIUS_PIXEL
 
 	# strokeWeight 1
 	noStroke()
 	push()
 	fill 'darkgray'
 	for i in [0...8]
-		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 6.5 * SIZE_PIXEL
-		text RANKS[i], OS + 0.5*SIZE_PIXEL,     OS + (i+0.05)*SIZE_PIXEL
+		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 7 * SIZE_PIXEL # letters
+		if i<7
+			text RANKS[i], OS + 0.0*SIZE_PIXEL,     OS + (i+0.044)*SIZE_PIXEL # digits
 	pop()
 
 	push()
