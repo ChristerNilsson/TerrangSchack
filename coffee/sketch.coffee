@@ -1,4 +1,4 @@
-VERSION = 57
+VERSION = 58
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -17,7 +17,7 @@ DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 
 
 #################
 
-FILES = 'abcdefgh' # De rutor man har hand om
+FILES = 'abcdefgh'
 RANKS = '87654321'
 
 targets = []
@@ -28,10 +28,14 @@ sounds = {}
 started = false
 
 matrix = {} # WGS84
-grid_meter = {} # meter
-grid_pixel = {} # pixel
-grid_meter.s = [3.5*SIZE_METER,3.5*SIZE_METER] # origo, samlingspunkt
-grid_pixel.s = [3.5*SIZE_PIXEL,3.5*SIZE_PIXEL] # origo, samlingspunkt
+grid_meter = {}
+grid_pixel = {}
+grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
+grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
+
+grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
+grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
+
 
 echo = console.log
 range = _.range
@@ -278,8 +282,8 @@ window.setup = ->
 	lat = (matrix.a8.lat + matrix.b7.lat) / 2
 	lon = (matrix.a8.lon + matrix.b7.lon) / 2
 	matrix.p = {lat, lon}
-	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
-	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
+	# grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
+	# grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
 
