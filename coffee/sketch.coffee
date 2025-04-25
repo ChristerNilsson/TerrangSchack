@@ -1,14 +1,15 @@
-VERSION = 69
+VERSION = 70
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 
-SIZE_PIXEL = 100 # En schackrutas storlek i pixlar
-SIZE_METER = 10 # En schackrutas storlek i meter
-FACTOR = SIZE_PIXEL / SIZE_METER
-RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
-RADIUS_PIXEL = 0.25 * SIZE_PIXEL
+SIZE_PIXEL = 0 # En schackrutas storlek i pixlar
+SIZE_METER = 0 # En schackrutas storlek i meter
+FACTOR = 1
+RADIUS_METER = 0 # meter. Maxavstånd mellan spelaren och target
+RADIUS_PIXEL = 0
+
 TIME = [90,30] # base in minutes, increment in seconds
 R = 6371e3  # Jordens radie i meter
 
@@ -30,11 +31,6 @@ started = false
 matrix = {} # WGS84
 grid_meter = {}
 grid_pixel = {}
-grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
-grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
-
-grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
-grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
 
 echo = console.log
 range = _.range
@@ -236,8 +232,21 @@ window.preload = ->
 
 window.setup = ->
 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
+
+	SIZE_PIXEL = width/8 # En schackrutas storlek i pixlar
+	SIZE_METER = 10 # En schackrutas storlek i meter
+	FACTOR = SIZE_PIXEL / SIZE_METER
+	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
+	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
+
+	grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
+	grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
+
+	grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
+	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
+
 	textAlign CENTER,CENTER
-	textSize 2*0.02 * height
+	textSize 0.04 * height
 	noFill()
 	frameRate 2
 
