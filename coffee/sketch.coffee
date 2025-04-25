@@ -1,4 +1,4 @@
-VERSION = 55
+VERSION = 56
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -6,7 +6,8 @@ START_POINT = lat : 59.270294, lon : 18.130309 # Kaninparken
 
 SIZE_PIXEL = 100 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
-RADIUS = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
+RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
+RADIUS_PIXEL = 0.25 * SIZE_PIXEL
 TIME = [90,30] # base in minutes, increment in seconds
 R = 6371e3  # Jordens radie i meter
 
@@ -138,7 +139,7 @@ wp = (p) =>
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
-	if RADIUS < distanceBetween matrix.p, matrix[target] then return
+	if RADIUS_METER < distanceBetween matrix.p, matrix[target] then return
 	if targets.length == 0
 		target = ''
 		return
@@ -255,7 +256,7 @@ window.setup = ->
 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
 	textAlign CENTER,CENTER
 	textSize 2*0.02 * height
-	noStroke()
+	noFill()
 	frameRate 2
 
 	matrix.s = START_POINT 
@@ -281,7 +282,7 @@ window.setup = ->
 	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
 	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
-	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS}m #{START_POINT.lat} #{START_POINT.lon}"  
+	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
 
 	echo 'matrix',matrix
 	echo 'grid_meter',grid_meter
@@ -295,47 +296,57 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
-	OS = 10 #10 # offset
+	OS = RADIUS_PIXEL #10 # offset
 	background 0
-	fill 255
+	# noFill() # 255
 	# scale 2
 	SP2 = SIZE_PIXEL/2
-	stroke 255
+
+	stroke 'white'
+	strokeWeight 2
+
 	[px,py] = grid_pixel.p
 	[tx,ty] = grid_pixel[target]
 	line OS + px, OS + py, OS + tx, OS + ty
-	noStroke()
+	# noStroke()
 
 	for key of grid_pixel
 		[x,y] = grid_pixel[key]
-		fill 'white'
-		if key == target then fill 'red'
+		# noFill()
+		stroke 'white'
+		if key == target then stroke 'red'
 		if key == 'p'
-			fill 'yellow'
-			circle OS + x, OS + y, 0.1 * SIZE_PIXEL
+			stroke 'yellow'
+			circle OS + x, OS + y, RADIUS_PIXEL
 		else
-			circle OS + x, OS + y, 0.1 * SIZE_PIXEL
+			circle OS + x, OS + y, RADIUS_PIXEL
 
-	fill 'green'
-	for i in [0...8]
-		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 6.75 * SIZE_PIXEL
-		text RANKS[i], OS + 0.2*SIZE_PIXEL,     OS + (i+0.05)*SIZE_PIXEL
-
+	# strokeWeight 1
+	noStroke()
 	push()
-	textSize 2*0.03 * height
-	textAlign 'left'
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,7.7*SIZE_PIXEL
-	textAlign 'center'
-	text target, OS+3.6*SIZE_PIXEL, 7.7*SIZE_PIXEL
-	textAlign 'right'
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',OS+7.2*SIZE_PIXEL,7.7*SIZE_PIXEL
+	fill 'gray'
+	for i in [0...8]
+		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 6.5 * SIZE_PIXEL
+		text RANKS[i], OS + 0.5*SIZE_PIXEL,     OS + (i+0.05)*SIZE_PIXEL
 	pop()
 
 	push()
+	fill 'yellow'
+	textSize 2*0.03 * height
+	textAlign 'left'
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,7.9*SIZE_PIXEL
+	textAlign 'center'
+	text target, OS+3.6*SIZE_PIXEL, 7.9*SIZE_PIXEL
+	textAlign 'right'
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',OS+7.2*SIZE_PIXEL,7.9*SIZE_PIXEL
+	pop()
+
+	push()
+	fill 'gray'
 	textAlign "left"
 	textSize 2*0.02 * height
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 8.2*SIZE_PIXEL + i*2*0.02 * height
+		text messages[i], 0.1*SIZE_PIXEL, 8.5*SIZE_PIXEL + i * 0.045 * height
 	pop()
 
 
