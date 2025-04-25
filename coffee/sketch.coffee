@@ -1,4 +1,4 @@
-VERSION = 67
+VERSION = 68
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -36,7 +36,6 @@ grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
 grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
 grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
 
-
 echo = console.log
 range = _.range
 
@@ -48,7 +47,6 @@ assert = (a,b) -> if a != b then echo 'assert',a,b
 
 watchID = null
 gpsCount = 0
-
 
 closestDistance = (m) =>
 	bestDist = 999999
@@ -233,25 +231,6 @@ initSounds = ->
 		sound.pan 0
 		sounds[name] = sound
 
-# locationUpdate = (p) ->
-# 	reason = 0
-# 	try
-# 		pLat = round p.coords.latitude,6
-# 		pLon = round p.coords.longitude,6
-# 		# if storage.trail.length == 0
-# 		# 	gpsLat = pLat
-# 		# 	gpsLon = pLon
-# 		# messages[5] = gpsCount++
-# 		decreaseQueue()
-# 		# reason = 1
-# 		increaseQueue p # meters
-# 		# reason = 2
-# 		# uppdatera pLat, pLon
-# 		# reason = 3
-# 	catch error
-# 		dump error
-# 		dump reason
-
 window.preload = ->
 	initSounds()
 
@@ -299,7 +278,7 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
-	OX = (width - 7*SIZE_PIXEL - 2*RADIUS_PIXEL) / 2 # offset x
+	OX = (width - 7*SIZE_PIXEL) / 2 # offset x
 	OY = 2*RADIUS_PIXEL # offset y
 	background 0
 
@@ -322,7 +301,6 @@ window.draw = ->
 		else
 			circle OX + x, OY + y, 2*RADIUS_PIXEL
 
-	# strokeWeight 1
 	noStroke()
 	push()
 	fill '#777'
@@ -336,11 +314,11 @@ window.draw = ->
 	push()
 	fill 'yellow'
 	textSize 2*0.03 * height
-	textAlign 'left'
+	textAlign LEFT
 	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0, 8.2*SIZE_PIXEL
-	textAlign 'center'
+	textAlign CENTER
 	text target, 0.5*width, 8.2*SIZE_PIXEL
-	textAlign 'right'
+	textAlign RIGHT
 	text round(distanceBetween(matrix.p, matrix[target])) + 'm', width, 8.2*SIZE_PIXEL
 	pop()
 
