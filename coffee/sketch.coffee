@@ -1,4 +1,4 @@
-VERSION = 56
+VERSION = 57
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -6,6 +6,7 @@ START_POINT = lat : 59.270294, lon : 18.130309 # Kaninparken
 
 SIZE_PIXEL = 100 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
+FACTOR = SIZE_PIXEL / SIZE_METER
 RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 RADIUS_PIXEL = 0.25 * SIZE_PIXEL
 TIME = [90,30] # base in minutes, increment in seconds
@@ -15,8 +16,6 @@ BEARINGLIST ='01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 
 DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 160 180 200 250 300 350 400 450 500 600 700 800 900 1000 1200 1400 1600 1800 2000 2500 3000 3500 4000 4500 5000 6000 7000 8000 9000'.split ' '
 
 #################
-
-FACTOR = SIZE_PIXEL / SIZE_METER
 
 FILES = 'abcdefgh' # De rutor man har hand om
 RANKS = '87654321'
@@ -324,7 +323,7 @@ window.draw = ->
 	# strokeWeight 1
 	noStroke()
 	push()
-	fill 'gray'
+	fill 'darkgray'
 	for i in [0...8]
 		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 6.5 * SIZE_PIXEL
 		text RANKS[i], OS + 0.5*SIZE_PIXEL,     OS + (i+0.05)*SIZE_PIXEL
@@ -334,19 +333,19 @@ window.draw = ->
 	fill 'yellow'
 	textSize 2*0.03 * height
 	textAlign 'left'
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,7.9*SIZE_PIXEL
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,8.2*SIZE_PIXEL
 	textAlign 'center'
-	text target, OS+3.6*SIZE_PIXEL, 7.9*SIZE_PIXEL
+	text target, OS+3.6*SIZE_PIXEL, 8.2*SIZE_PIXEL
 	textAlign 'right'
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm',OS+7.2*SIZE_PIXEL,7.9*SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',OS+7.2*SIZE_PIXEL,8.2*SIZE_PIXEL
 	pop()
 
 	push()
-	fill 'gray'
+	fill 'darkgray'
 	textAlign "left"
 	textSize 2*0.02 * height
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 8.5*SIZE_PIXEL + i * 0.045 * height
+		text messages[i], 0.1*SIZE_PIXEL, 9*SIZE_PIXEL + i * 0.045 * height
 	pop()
 
 
