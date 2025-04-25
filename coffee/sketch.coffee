@@ -1,4 +1,4 @@
-VERSION = 60
+VERSION = 61
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -327,7 +327,7 @@ window.draw = ->
 	noStroke()
 	push()
 	fill '#777'
-	textSize 2*0.02 * height
+	textSize 0.03 * height
 	for i in [0...8]
 		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 7 * SIZE_PIXEL # letters
 		if i<7
