@@ -1,10 +1,10 @@
-VERSION = 53
+VERSION = 54
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
 START_POINT = lat : 59.270294, lon : 18.130309 # Kaninparken
 
-SIZE_PIXEL = 200 # En schackrutas storlek i pixlar
+SIZE_PIXEL = 100 # En schackrutas storlek i pixlar
 SIZE_METER = 10 # En schackrutas storlek i meter
 RADIUS = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 TIME = [90,30] # base in minutes, increment in seconds
@@ -17,8 +17,8 @@ DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 
 
 FACTOR = SIZE_PIXEL / SIZE_METER
 
-FILES = 'efgh' # De 16 rutor man har hand om
-RANKS = '4321'
+FILES = 'abcdefgh' # De rutor man har hand om
+RANKS = '87654321'
 
 targets = []
 target = ""
@@ -30,8 +30,8 @@ started = false
 matrix = {} # WGS84
 grid_meter = {} # meter
 grid_pixel = {} # pixel
-grid_meter.s = [0,0] # origo, samlingspunkt
-grid_pixel.s = [0,0] # origo, samlingspunkt
+grid_meter.s = [3.5*SIZE_METER,3.5*SIZE_METER] # origo, samlingspunkt
+grid_pixel.s = [3.5*SIZE_PIXEL,3.5*SIZE_PIXEL] # origo, samlingspunkt
 
 echo = console.log
 range = _.range
@@ -259,26 +259,26 @@ window.setup = ->
 	frameRate 2
 
 	matrix.s = START_POINT 
-	arr = (destinationPoint matrix.s.lat, matrix.s.lon, (i+0.5) * SIZE_METER, 90 for i in [0...4])
+	arr = (destinationPoint matrix.s.lat, matrix.s.lon, i * SIZE_METER, 90 for i in [0...8])
 
-	for i in [0...4]
-		for j in [0...4]
+	for i in [0...8]
+		for j in [0...8]
 			key = "#{FILES[i]}#{RANKS[j]}"
-			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j+0.5) * SIZE_METER, 180
-			grid_pixel[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
-			grid_meter[key] = [(i+0.5) * SIZE_METER, (j+0.5) * SIZE_METER]
+			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
+			grid_pixel[key] = [i * SIZE_PIXEL, j * SIZE_PIXEL]
+			grid_meter[key] = [i * SIZE_METER, j * SIZE_METER]
 
 	targets = _.keys matrix
-	targets = 's h1 g1 f1 e1 e2 f2 g2 h2 h3 g3 f3 e3 e4 f4 g4 h4 p'.split ' '
+	targets = 's a1 a8 h1 h8 p'.split ' '
 	# targets = _.shuffle targets
 	echo targets
 	target = targets.shift()
 
-	# kvadrantens mittpunkt
-	lat = (matrix.f3.lat + matrix.g2.lat) / 2
-	lon = (matrix.f3.lon + matrix.g2.lon) / 2
+	# NW hörnet
+	lat = (matrix.a8.lat + matrix.b7.lat) / 2
+	lon = (matrix.a8.lon + matrix.b7.lon) / 2
 	matrix.p = {lat, lon}
-	grid_pixel.p = [2*SIZE_PIXEL, 2*SIZE_PIXEL]
+	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
 	grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS}m #{START_POINT.lat} #{START_POINT.lon}"  
@@ -295,6 +295,7 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
+	OS = 10 #10 # offset
 	background 0
 	fill 255
 	# scale 2
@@ -302,7 +303,7 @@ window.draw = ->
 	stroke 255
 	[px,py] = grid_pixel.p
 	[tx,ty] = grid_pixel[target]
-	line 10 + px, 10 + py, 10 + tx, 10 + ty
+	line OS + px, OS + py, OS + tx, OS + ty
 	noStroke()
 
 	for key of grid_pixel
@@ -311,27 +312,30 @@ window.draw = ->
 		if key == target then fill 'red'
 		if key == 'p'
 			fill 'yellow'
-			circle 10 + x, 10 + y, 0.1 * SIZE_PIXEL
+			circle OS + x, OS + y, 0.1 * SIZE_PIXEL
 		else
-			circle 10 + x, 10 + y, 0.1 * SIZE_PIXEL
+			circle OS + x, OS + y, 0.1 * SIZE_PIXEL
 
 	fill 'green'
-	for i in [0...4]
-		text FILES[i], 10 + SP2 + i*SIZE_PIXEL, 10 + 0.25 * SIZE_PIXEL
-		text RANKS[i], 10 + SP2/2,              10 + SP2 + i*SIZE_PIXEL
+	for i in [0...8]
+		text FILES[i], OS + (i+0.0)*SIZE_PIXEL, OS + 6.75 * SIZE_PIXEL
+		text RANKS[i], OS + 0.2*SIZE_PIXEL,     OS + (i+0.05)*SIZE_PIXEL
 
 	push()
 	textSize 0.5 * SIZE_PIXEL
-	text round(bearingBetween(matrix.p, matrix[target])) + '°',10+0.5*SIZE_PIXEL,4.1*SIZE_PIXEL
-	text target, 10+2*SIZE_PIXEL, 4.1*SIZE_PIXEL
-	text round(distanceBetween(matrix.p, matrix[target]),2) + 'm',10+3.5*SIZE_PIXEL,4.1*SIZE_PIXEL
+	textAlign 'left'
+	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,7.7*SIZE_PIXEL
+	textAlign 'center'
+	text target, OS+3.6*SIZE_PIXEL, 7.7*SIZE_PIXEL
+	textAlign 'right'
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm',OS+7.2*SIZE_PIXEL,7.7*SIZE_PIXEL
 	pop()
 
 	push()
 	textAlign "left"
 	textSize 0.2 * SIZE_PIXEL
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 4.5*SIZE_PIXEL + i*0.2 * SIZE_PIXEL
+		text messages[i], 0.1*SIZE_PIXEL, 8.2*SIZE_PIXEL + i*0.2 * SIZE_PIXEL
 	pop()
 
 
