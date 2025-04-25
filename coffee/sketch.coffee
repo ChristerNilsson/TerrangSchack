@@ -1,4 +1,4 @@
-VERSION = 54
+VERSION = 55
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -254,7 +254,7 @@ window.preload = ->
 window.setup = ->
 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
 	textAlign CENTER,CENTER
-	textSize 0.3 * SIZE_PIXEL
+	textSize 2*0.02 * height
 	noStroke()
 	frameRate 2
 
@@ -322,7 +322,7 @@ window.draw = ->
 		text RANKS[i], OS + 0.2*SIZE_PIXEL,     OS + (i+0.05)*SIZE_PIXEL
 
 	push()
-	textSize 0.5 * SIZE_PIXEL
+	textSize 2*0.03 * height
 	textAlign 'left'
 	text round(bearingBetween(matrix.p, matrix[target])) + '°',OS+0.0*SIZE_PIXEL,7.7*SIZE_PIXEL
 	textAlign 'center'
@@ -333,9 +333,9 @@ window.draw = ->
 
 	push()
 	textAlign "left"
-	textSize 0.2 * SIZE_PIXEL
+	textSize 2*0.02 * height
 	for i in range messages.length
-		text messages[i], 0.1*SIZE_PIXEL, 8.2*SIZE_PIXEL + i*0.2 * SIZE_PIXEL
+		text messages[i], 0.1*SIZE_PIXEL, 8.2*SIZE_PIXEL + i*2*0.02 * height
 	pop()
 
 
