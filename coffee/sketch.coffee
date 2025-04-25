@@ -1,4 +1,4 @@
-VERSION = 68
+VERSION = 69
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -324,8 +324,8 @@ window.draw = ->
 
 	push()
 	fill '#777'
-	textAlign "left"
-	textSize 0.036 * height
+	textAlign LEFT
+	textSize 0.034 * height
 	for i in range messages.length
 		text messages[i], 0.0*SIZE_PIXEL, 9*SIZE_PIXEL + i * 0.04 * height
 	pop()
