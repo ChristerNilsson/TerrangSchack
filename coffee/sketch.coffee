@@ -1,4 +1,4 @@
-VERSION = 65
+VERSION = 66
 
 # START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
 # START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
@@ -299,7 +299,8 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
-	OS = 2*RADIUS_PIXEL #10 # offset
+	OX = (width - 7*SIZE_PIXEL - 2*RADIUS_PIXEL)2 #10 # offset
+	OY = 2*RADIUS_PIXEL
 	background 0
 	# noFill() # 255
 	SP2 = SIZE_PIXEL/2
@@ -309,7 +310,7 @@ window.draw = ->
 
 	[px,py] = grid_pixel.p
 	[tx,ty] = grid_pixel[target]
-	line OS + px, OS + py, OS + tx, OS + ty
+	line OX + px, OY + py, OX + tx, OY + ty
 	# noStroke()
 
 	for key of grid_pixel
@@ -319,9 +320,9 @@ window.draw = ->
 		if key == target then stroke 'red'
 		if key == 'p'
 			stroke 'yellow'
-			circle OS + x, OS + y, 2*RADIUS_PIXEL
+			circle OX + x, OY + y, 2*RADIUS_PIXEL
 		else
-			circle OS + x, OS + y, 2*RADIUS_PIXEL
+			circle OX + x, OY + y, 2*RADIUS_PIXEL
 
 	# strokeWeight 1
 	noStroke()
@@ -329,9 +330,9 @@ window.draw = ->
 	fill '#777'
 	textSize 0.025 * height
 	for i in [0...8]
-		text FILES[i], OS + i*SIZE_PIXEL, OS + 7 * SIZE_PIXEL # letters
+		text FILES[i], OX + i*SIZE_PIXEL, OY + 7 * SIZE_PIXEL # letters
 		if i < 7
-			text RANKS[i], OS,            OS + (i+0.043)*SIZE_PIXEL # digits
+			text RANKS[i], OX,            OY + (i+0.043)*SIZE_PIXEL # digits
 	pop()
 
 	push()
