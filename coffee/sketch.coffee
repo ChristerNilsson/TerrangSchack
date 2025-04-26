@@ -18,8 +18,10 @@ DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 
 
 #################
 
-FILES = 'abcdefgh'
-RANKS = '87654321'
+LETTERS = 'abcdefgh'
+DIGITS = '87654321'
+
+PIECES = {}
 
 targets = []
 target = ""
@@ -132,7 +134,7 @@ wp = (p) =>
 	matrix.p.lon = p.coords.longitude
 	grid_meter.p = makePoint matrix.s, matrix.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
-	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target])}m #{round p.coords.latitude,6} #{round p.coords.longitude,6} #{round p.coords.accuracy, 1}" 
+	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target])}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" 
 
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
@@ -229,9 +231,23 @@ initSounds = ->
 
 window.preload = ->
 	initSounds()
+	PIECES.WK = loadImage './pieces/WK.svg'
+	PIECES.WQ = loadImage './pieces/WQ.svg'
+	PIECES.WR = loadImage './pieces/WR.svg'
+	PIECES.WB = loadImage './pieces/WB.svg'
+	PIECES.WN = loadImage './pieces/WN.svg'
+	PIECES.WP = loadImage './pieces/WP.svg'
+	PIECES.BK = loadImage './pieces/BK.svg'
+	PIECES.BQ = loadImage './pieces/BQ.svg'
+	PIECES.BR = loadImage './pieces/BR.svg'
+	PIECES.BB = loadImage './pieces/BB.svg'
+	PIECES.BN = loadImage './pieces/BN.svg'
+	PIECES.BP = loadImage './pieces/BP.svg'
 
 window.setup = ->
 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
+
+	rectMode CENTER
 
 	SIZE_PIXEL = width/8 # En schackrutas storlek i pixlar
 	SIZE_METER = 10 # En schackrutas storlek i meter
@@ -255,7 +271,7 @@ window.setup = ->
 
 	for i in [0...8]
 		for j in [0...8]
-			key = "#{FILES[i]}#{RANKS[j]}"
+			key = "#{LETTERS[i]}#{DIGITS[j]}"
 			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
 			grid_pixel[key] = [i * SIZE_PIXEL, j * SIZE_PIXEL]
 			grid_meter[key] = [i * SIZE_METER, j * SIZE_METER]
@@ -287,37 +303,39 @@ window.setup = ->
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
 window.draw = ->
+	background 0
 	OX = (width - 7*SIZE_PIXEL) / 2 # offset x
 	OY = 2*RADIUS_PIXEL # offset y
-	background 0
 
-	stroke 'white'
-	strokeWeight 2
+	keys = Object.keys(grid_pixel).sort()
+	for key in keys
+		[x,y] = grid_pixel[key]
+		stroke 'white'
+		if key == target then stroke 'red'
+		if key == 'p' then stroke 'yellow'
+		if key in [target, 'p'] 
+			noFill()
+			strokeWeight 2
+			circle OX + x, OY + y, 2*RADIUS_PIXEL
+		else
+			letter = LETTERS.indexOf key[0]
+			digit = DIGITS.indexOf key[1]
+			fill if (letter+digit) % 2 == 0 then 'gray' else 'lightgray'
+			noStroke()
+			rect OX + x, OY + y, 4*RADIUS_PIXEL
 
+	stroke 'black'
 	[px,py] = grid_pixel.p
 	[tx,ty] = grid_pixel[target]
 	line OX + px, OY + py, OX + tx, OY + ty
-	# noStroke()
-
-	for key of grid_pixel
-		[x,y] = grid_pixel[key]
-		# noFill()
-		stroke 'white'
-		if key == target then stroke 'red'
-		if key == 'p'
-			stroke 'yellow'
-			circle OX + x, OY + y, 2*RADIUS_PIXEL
-		else
-			circle OX + x, OY + y, 2*RADIUS_PIXEL
 
 	noStroke()
 	push()
-	fill '#777'
-	textSize 0.025 * height
+	fill '#444'
+	textSize 0.02 * height
 	for i in [0...8]
-		text FILES[i], OX + i*SIZE_PIXEL, OY + 7 * SIZE_PIXEL # letters
-		if i < 7
-			text RANKS[i], OX,            OY + (i+0.043)*SIZE_PIXEL # digits
+		text LETTERS[i], 10 + i*SIZE_PIXEL, 55 + 7 * SIZE_PIXEL # letters
+		text DIGITS[i],  width-8,           10 + (i+0.043)*SIZE_PIXEL # digits
 	pop()
 
 	push()
@@ -339,7 +357,12 @@ window.draw = ->
 		text messages[i], 0, 9.3 * SIZE_PIXEL + i * 0.04 * height
 	pop()
 
-
+	letters = "RNBQKBNR"
+	for i in [0...8]
+		image PIECES['B'+letters[i]], i*SIZE_PIXEL, 0*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+		image PIECES['BP'],           i*SIZE_PIXEL, 1*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+		image PIECES['WP'],           i*SIZE_PIXEL, 6*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+		image PIECES['W'+letters[i]], i*SIZE_PIXEL, 7*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
 
 
 
