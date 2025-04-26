@@ -1,7 +1,5 @@
 VERSION = 71
 
-# START_POINT = lat: 59.271667, lon: 18.151778 # knixen på kraftledningen NO Brotorp
-# START_POINT = lat : 59.266338, lon : 18.131969 # Brandparken
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 
 SIZE_PIXEL = 0 # En schackrutas storlek i pixlar
@@ -124,9 +122,6 @@ increaseQueue = (p) ->
 		gpsLat = round p.coords.latitude,6
 		gpsLon = round p.coords.longitude,6
 
-
-
-
 wp = (p) =>
 	#sounds.soundDown.play()
 	gpsCount += 1
@@ -231,18 +226,9 @@ initSounds = ->
 
 window.preload = ->
 	initSounds()
-	PIECES.WK = loadImage './pieces/WK.svg'
-	PIECES.WQ = loadImage './pieces/WQ.svg'
-	PIECES.WR = loadImage './pieces/WR.svg'
-	PIECES.WB = loadImage './pieces/WB.svg'
-	PIECES.WN = loadImage './pieces/WN.svg'
-	PIECES.WP = loadImage './pieces/WP.svg'
-	PIECES.BK = loadImage './pieces/BK.svg'
-	PIECES.BQ = loadImage './pieces/BQ.svg'
-	PIECES.BR = loadImage './pieces/BR.svg'
-	PIECES.BB = loadImage './pieces/BB.svg'
-	PIECES.BN = loadImage './pieces/BN.svg'
-	PIECES.BP = loadImage './pieces/BP.svg'
+	for piece in "KQRBNP"	
+		PIECES["B#{piece}"] = loadImage "./pieces/B#{piece}.svg"
+		PIECES["W#{piece}"] = loadImage "./pieces/W#{piece}.svg"
 
 window.setup = ->
 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
@@ -269,8 +255,8 @@ window.setup = ->
 	matrix.s = START_POINT 
 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, i * SIZE_METER, 90 for i in [0...8])
 
-	for i in [0...8]
-		for j in [0...8]
+	for i in range 8
+		for j in range 8
 			key = "#{LETTERS[i]}#{DIGITS[j]}"
 			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
 			grid_pixel[key] = [i * SIZE_PIXEL, j * SIZE_PIXEL]
@@ -333,7 +319,7 @@ window.draw = ->
 	push()
 	fill '#444'
 	textSize 0.02 * height
-	for i in [0...8]
+	for i in range 8
 		text LETTERS[i], 10 + i*SIZE_PIXEL, 55 + 7 * SIZE_PIXEL # letters
 		text DIGITS[i],  width-8,           10 + (i+0.043)*SIZE_PIXEL # digits
 	pop()
@@ -358,236 +344,8 @@ window.draw = ->
 	pop()
 
 	letters = "RNBQKBNR"
-	for i in [0...8]
+	for i in range 8
 		image PIECES['B'+letters[i]], i*SIZE_PIXEL, 0*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
 		image PIECES['BP'],           i*SIZE_PIXEL, 1*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
 		image PIECES['WP'],           i*SIZE_PIXEL, 6*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
 		image PIECES['W'+letters[i]], i*SIZE_PIXEL, 7*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-
-
-
-
-
-
-# class Player
-# 	constructor : (@name, @tx=4*SIZE, @ty=4*SIZE) ->
-# 		@speed = SPEED
-# 		@pos = createVector 4*SIZE,4*SIZE
-# 		@target = new Square createVector @tx, @ty
-# 		@home = @target
-# 		@squares = [] # lista med Square som ej påbörjats
-# 		@trail = []
-# 		@n = 0
-# 		@distance = 0
-# 		@assists = 0
-
-# 	closest : ->
-# 		if @squares.length == 0 then return null
-# 		bestDist = 99999
-# 		bestSq = @squares[0]
-# 		for square in @squares
-# 			d = p5.Vector.dist square.pos, @pos
-# 			if d < bestDist
-# 				bestDist = d
-# 				bestSq = square
-# 		bestSq
-
-# 	add : (sq) ->
-# 		@squares.push sq
-# 		@target = @closest()
-
-# 	drawTail : ->
-# 		if @n % (10/SPEED) == 0 then @trail.push createVector @pos.x, @pos.y
-# 		@n += 1
-# 		if @trail.length > MAXTRAIL then @trail.shift()
-# 		stroke 'black'
-# 		for i in [0...@trail.length]
-# 			size = map i, 0, @trail.length - 1, 5,15
-# 			noFill()
-# 			ellipse @trail[i].x, @trail[i].y, size, size
-
-# 	draw : () ->
-# 		target = @target.pos
-# 		dx = target.x - @pos.x
-# 		dy = target.y - @pos.y
-# 		d = sqrt dx*dx+dy*dy
-
-# 		stroke 'black'
-
-# 		# if @name in 'ABCD'
-# 		line target.x, target.y, @pos.x, @pos.y
-
-# 		step = p5.Vector.sub(target, @pos).setMag min @speed, d
-# 		if d < @speed # target nådd
-# 			if not @target.done
-# 				@target.done = true
-# 				@target.carrier = @name
-
-# 				# Skicka draget om både start.done och slut.done
-# 				for key of games
-# 					g = games[key]
-# 					if g.move and g.move.start.done and g.move.stopp.done						
-# 						duration = (15/SPEED * (performance.now() - g.move.start.time)/1000)
-
-# 						if g.index % 2 == 0 then g.duration += duration
-# 						if g.move.start.carrier == g.move.stopp.carrier
-# 							carriers = g.move.start.carrier
-# 						else 
-# 							carriers = g.move.start.carrier + g.move.stopp.carrier
-
-# 						if g.move.start.carrier in 'ABCD'
-# 							# echo 'assists: ',g.move.start.carrier,g.move.stopp.carrier
-# 							players[g.move.start.carrier].assists += 1
-# 							players[g.move.stopp.carrier].assists += 1
-# 							# echo g.name, g.move.uci, @name, g.move.start.carrier + g.move.stopp.carrier
-
-# 						g.chess.move { from: g.move.uci.slice(0, 2), to: g.move.uci.slice(2, 4) }
-
-# 						td = document.getElementById("SEL#{g.name}")
-# 						td.innerHTML += "#{g.san_moves[g.chess.history().length-1]} by #{carriers} (#{duration.toFixed()} s)<br>"
-
-# 						document.getElementById("board#{g.name}").innerHTML = shrink g.chess.ascii()
-# 						updateInfo g.name, @
-
-# 						g.queue.push g.move
-# 						g.move = null
-# 						if g.initMove() == false
-# 							stoppTime = Date.now()
-# 							# echo 'done', (stoppTime-startTime)/1000
-
-# 			@squares = _.filter @squares, (sq) -> sq.done == false
-
-# 			# hämta närmaste uppdrag om sådant finns
-# 			if @squares.length > 0
-# 				@target = @closest()
-# 				d = p5.Vector.dist @pos,@target.pos
-# 				@distance += d
-
-# 		@pos.add step
-
-# 		for square in @squares
-# 			if @name in 'ABCD'
-# 				fill 'red'
-# 			else
-# 				fill 'black'
-# 			circle square.pos.x, square.pos.y, 10
-
-# 		# if @name in 'ABCD'
-# 		@drawTail()
-# 		if @name in 'ABCD' then fill 'yellow' else fill 'black'
-# 		strokeWeight 1
-# 		circle @pos.x,@pos.y,0.4*SIZE
-# 		if @name in 'ABCD' then fill 'black' else fill 'yellow'
-# 		noStroke()
-# 		# fill 'black'
-# 		text @name, @pos.x, @pos.y
-
-# uci2pos = (uci) -> # t ex e2e4 => [[225,75],[225,175]]
-# 	startx = uci[0]
-# 	starty = uci[1]
-# 	stoppx = uci[2]
-# 	stoppy = uci[3]
-# 	result = []
-# 	x = FILES.indexOf startx
-# 	y = 7 - RANKS.indexOf starty
-# 	result.push createVector SIZE/2 + SIZE*x, SIZE/2 + SIZE*y
-# 	x = FILES.indexOf stoppx
-# 	y = 7 - RANKS.indexOf stoppy
-# 	result.push createVector SIZE/2 + SIZE*x, SIZE/2 + SIZE*y
-# 	result
-
-# class Game
-# 	constructor : (@name, pgn, @link) ->
-# 		@chess = new Chess()
-# 		@chess.load_pgn pgn
-# 		@san_moves = @chess.history() # [Nf3, ...]
-# 		@uci_moves = (move.from + move.to for move in @chess.history({ verbose: true })) # [g1f3, ...]
-# 		@move = null
-# 		@queue = []
-# 		@duration = 0
-# 		@chess.reset()
-# 		@index = -1
-# 		document.getElementById("link#{@name}").innerHTML = "<a href=\"#{@link}\" target=\"_blank\">Link</a>"
-
-# 	initMove : ->
-# 		if @index >= @uci_moves.length - 1 then return false
-# 		@index += 1
-# 		if @move != null 
-# 			#echo 'too quick!'
-# 			return false
-# 		@move = new Move @uci_moves[@index], @name
-
-# 		start = @move.uci.slice 0,2
-# 		stopp = @move.uci.slice 2,4
-
-# 		antal = 'ABCD'.indexOf @name
-# 		for i in [0...antal] 
-# 			start = rotate start
-# 			stopp = rotate stopp
-
-# 		if @index % 2 == 0
-# 			a = "1234"
-# 			b = "5678"
-# 			# Dela ut start och stopp till rätt spelare beroende på kvadrant
-# 			if start[0] in "abcd" and start[1] in a then players.A.add @move.start
-# 			if start[0] in "efgh" and start[1] in a then players.B.add @move.start
-# 			if start[0] in "abcd" and start[1] in b then players.C.add @move.start
-# 			if start[0] in "efgh" and start[1] in b then players.D.add @move.start
-
-# 			if stopp[0] in "abcd" and stopp[1] in a then players.A.add @move.stopp
-# 			if stopp[0] in "efgh" and stopp[1] in a then players.B.add @move.stopp
-# 			if stopp[0] in "abcd" and stopp[1] in b then players.C.add @move.stopp
-# 			if stopp[0] in "efgh" and stopp[1] in b then players.D.add @move.stopp
-
-# 		else
-# 			a = "1234"
-# 			b = "5678"
-# 			# Hantera motståndaren
-# 			# Dela ut start och stopp till rätt spelare beroende på kvadrant
-# 			if start[0] in "abcd" and start[1] in a then players.G.add @move.start
-# 			if start[0] in "abcd" and start[1] in b then players.E.add @move.start
-# 			if start[0] in "efgh" and start[1] in a then players.H.add @move.start
-# 			if start[0] in "efgh" and start[1] in b then players.F.add @move.start
-
-# 			if stopp[0] in "abcd" and stopp[1] in a then players.G.add @move.stopp
-# 			if stopp[0] in "abcd" and stopp[1] in b then players.E.add @move.stopp
-# 			if stopp[0] in "efgh" and stopp[1] in a then players.H.add @move.stopp
-# 			if stopp[0] in "efgh" and stopp[1] in b then players.F.add @move.stopp
-# 		true
-
-# class Square 
-# 	constructor : (@pos, @uci="", @carrier="") -> # Vector
-# 		@done = false
-# 		@time = performance.now()
-	
-# # rotate = (sq) -> FILES[8-sq[1]] + String 1 + FILES.indexOf sq[0]
-# # echo "g3" == rotate "c2"
-# # echo "h1" == rotate "a1"
-# # echo "h8" == rotate rotate "a1"
-# # echo "a8" == rotate rotate rotate "a1"
-# # echo "a1" == rotate rotate rotate rotate "a1"
-
-# # coordinates = (sq) ->
-# # 	x = FILES.indexOf sq[0]
-# # 	y = RANKS.indexOf sq[1]
-# # 	[x, 7-y]
-# # echo _.isEqual [4,4], coordinates "e4"
-# # echo _.isEqual [0,7], coordinates "a1"
-
-# # toVector = ([x,y]) ->
-# # 	createVector SIZE/2 + SIZE*x, SIZE/2 + SIZE*y
-# # echo toVector [3,4]
-
-# class Move
-# 	constructor : (@uci, @name) -> # e2e4, B
-# 		antal = "ABCD".indexOf @name
-# 		start = @uci.slice 0,2
-# 		stopp = @uci.slice 2,4
-# 		for i in [0...antal]
-# 			start = rotate start
-# 			stopp = rotate stopp
-# 		start = toVector coordinates start
-# 		stopp = toVector coordinates stopp
-# 		@pos = [start, stopp]
-# 		@start = new Square start, @uci
-# 		@stopp = new Square stopp, @uci
