@@ -1,3 +1,5 @@
+echo = console.log 
+
 points = []
 watchId = null
 
@@ -29,18 +31,16 @@ recordPoint = (position) ->
 	
 	points.push point
 
-	document.getElementById('output').textContent = "#{points.length}\n" + JSON.stringify(point, null, 2)
+	document.getElementById('output').textContent = "#{points.length}\n" + JSON.stringify point, null, 2
 
-	if points.length >= 300
-		stopRecording()
+	if points.length >= 300 then stopRecording()
 
-showError = (error) ->
-	console.error "Geolocation error: #{error.message}"
+showError = (error) -> console.error "Geolocation error: #{error.message}"
 
 saveData = ->
-	blob = new Blob([JSON.stringify(points, null, 2)], {type: "application/json"})
-	url = URL.createObjectURL(blob)
-	link = document.createElement("a")
+	blob = new Blob [JSON.stringify points, null, 2], {type: "application/json"}
+	url = URL.createObjectURL blob
+	link = document.createElement "a"
 	link.href = url
 	link.download = "gps_data.json"
 	link.click()
