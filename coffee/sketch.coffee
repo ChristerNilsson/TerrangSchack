@@ -21,6 +21,8 @@ DIGITS = '87654321'
 
 PIECES = {}
 
+chessWrapper = null
+
 targets = []
 target = ""
 
@@ -35,14 +37,14 @@ grid_pixel = {}
 echo = console.log
 range = _.range
 
+watchID = null
+gpsCount = 0
+
 dump = (msg) ->
 	messages.unshift msg # nyaste överst
 	if messages.length > 20 then messages.pop() # äldsta droppas
 
 assert = (a,b) -> if a != b then echo 'assert',a,b
-
-watchID = null
-gpsCount = 0
 
 closestDistance = (m) =>
 	bestDist = 999999
@@ -142,13 +144,21 @@ wp = (p) =>
 
 wperr = (err) -> dump "Fel: #{err.message}"
 
-window.touchStarted = ->
-	if not started
-		userStartAudio()
-		startTracking()
-		started = true
-	sounds.soundDown.play()
-	return false
+# window.touchStarted = () ->
+# 	echo mouseX, mouseY
+# 	if mouseY > 8 * SIZE_PIXEL
+# 		if not started
+# 			userStartAudio()
+# 			startTracking()
+# 			started = true
+# 		sounds.soundDown.play()
+# 	else
+# 		letter = LETTERS[round mouseX / SIZE_PIXEL - 0.5]
+# 		digit  =  DIGITS[round mouseY / SIZE_PIXEL - 0.5]
+# 		echo letter + digit
+# 		chessWrapper.clickSquare letter + digit
+
+# 	return false
 
 startTracking = ->
 
@@ -224,128 +234,210 @@ initSounds = ->
 		sound.pan 0
 		sounds[name] = sound
 
-window.preload = ->
-	initSounds()
-	for piece in "KQRBNP"	
-		PIECES["B#{piece}"] = loadImage "./pieces/B#{piece}.svg"
-		PIECES["W#{piece}"] = loadImage "./pieces/W#{piece}.svg"
+# window.preload = ->
+# 	initSounds()
+# 	for piece in "KQRBNP"	
+# 		PIECES["B#{piece}"] = loadImage "./pieces/B#{piece}.svg"
+# 		PIECES["W#{piece}"] = loadImage "./pieces/W#{piece}.svg"
 
-window.setup = ->
-	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
+# window.setup = ->
+# 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
 
-	rectMode CENTER
+# 	rectMode CENTER
 
-	SIZE_PIXEL = width/8 # En schackrutas storlek i pixlar
-	SIZE_METER = 10 # En schackrutas storlek i meter
-	FACTOR = SIZE_PIXEL / SIZE_METER
-	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
-	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
+# 	SIZE_PIXEL = width/8 # En schackrutas storlek i pixlar
+# 	SIZE_METER = 10 # En schackrutas storlek i meter
+# 	FACTOR = SIZE_PIXEL / SIZE_METER
+# 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
+# 	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
 
-	grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
-	grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
+# 	grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
+# 	grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
 
-	grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
-	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
+# 	grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
+# 	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
 
-	textAlign CENTER,CENTER
-	textSize 0.04 * height
-	noFill()
-	frameRate 2
+# 	textAlign CENTER,CENTER
+# 	textSize 0.04 * height
+# 	noFill()
+# 	frameRate 2
 
-	matrix.s = START_POINT 
-	arr = (destinationPoint matrix.s.lat, matrix.s.lon, i * SIZE_METER, 90 for i in [0...8])
+# 	matrix.s = START_POINT 
+# 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, i * SIZE_METER, 90 for i in [0...8])
 
-	for i in range 8
-		for j in range 8
-			key = "#{LETTERS[i]}#{DIGITS[j]}"
-			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
-			grid_pixel[key] = [i * SIZE_PIXEL, j * SIZE_PIXEL]
-			grid_meter[key] = [i * SIZE_METER, j * SIZE_METER]
+# 	for i in range 8
+# 		for j in range 8
+# 			key = "#{LETTERS[i]}#{DIGITS[j]}"
+# 			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
+# 			grid_pixel[key] = [i * SIZE_PIXEL, j * SIZE_PIXEL]
+# 			grid_meter[key] = [i * SIZE_METER, j * SIZE_METER]
 
-	targets = _.keys matrix
-	targets = 's a1 a8 h1 h8 p'.split ' '
-	# targets = _.shuffle targets
-	echo targets
-	target = targets.shift()
+# 	targets = _.keys matrix
+# 	targets = 's a1 a8 h1 h8 p'.split ' '
+# 	# targets = _.shuffle targets
+# 	echo targets
+# 	target = targets.shift()
 
-	# NW hörnet
-	lat = (matrix.a8.lat + matrix.b7.lat) / 2
-	lon = (matrix.a8.lon + matrix.b7.lon) / 2
-	matrix.p = {lat, lon}
-	# grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
-	# grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
+# 	# NW hörnet
+# 	lat = (matrix.a8.lat + matrix.b7.lat) / 2
+# 	lon = (matrix.a8.lon + matrix.b7.lon) / 2
+# 	matrix.p = {lat, lon}
+# 	# grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
+# 	# grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
 
-	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
+# 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
 
-	echo 'matrix',matrix
-	echo 'grid_meter',grid_meter
-	echo 'grid_pixel',grid_pixel
+# 	echo 'matrix',matrix
+# 	echo 'grid_meter',grid_meter
+# 	echo 'grid_pixel',grid_pixel
 
-	# assert 224, round distanceBetween matrix.c1, matrix.d3
-	# assert  27, round bearingBetween matrix.c1, matrix.d3
-	# assert  90, round bearingBetween matrix.c3, matrix.d3
-	# assert 108, round bearingBetween matrix.a4, matrix.d3
-	# assert 214, round bearingBetween matrix.c4, matrix.a1
-	# assert 297, round bearingBetween matrix.d2, matrix.b3
+# 	# assert 224, round distanceBetween matrix.c1, matrix.d3
+# 	# assert  27, round bearingBetween matrix.c1, matrix.d3
+# 	# assert  90, round bearingBetween matrix.c3, matrix.d3
+# 	# assert 108, round bearingBetween matrix.a4, matrix.d3
+# 	# assert 214, round bearingBetween matrix.c4, matrix.a1
+# 	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
-window.draw = ->
-	background 0
-	OX = (width - 7*SIZE_PIXEL) / 2 # offset x
-	OY = 2*RADIUS_PIXEL # offset y
+# window.draw = ->
+# 	background 0
+# 	OX = (width - 7*SIZE_PIXEL) / 2 # offset x
+# 	OY = 2*RADIUS_PIXEL # offset y
 
-	keys = Object.keys(grid_pixel).sort()
-	for key in keys
-		[x,y] = grid_pixel[key]
-		stroke 'white'
-		if key == target then stroke 'red'
-		if key == 'p' then stroke 'yellow'
-		if key in [target, 'p'] 
-			noFill()
-			strokeWeight 2
-			circle OX + x, OY + y, 2*RADIUS_PIXEL
-		else
-			letter = LETTERS.indexOf key[0]
-			digit = DIGITS.indexOf key[1]
-			fill if (letter+digit) % 2 == 0 then 'gray' else 'lightgray'
-			noStroke()
-			rect OX + x, OY + y, 4*RADIUS_PIXEL
+# 	keys = Object.keys(grid_pixel).sort()
+# 	for key in keys
+# 		[x,y] = grid_pixel[key]
+# 		stroke 'white'
+# 		if key == target then stroke 'red'
+# 		if key == 'p' then stroke 'yellow'
+# 		if key in [target, 'p'] 
+# 			noFill()
+# 			strokeWeight 2
+# 			circle OX + x, OY + y, 2*RADIUS_PIXEL
+# 		else
+# 			letter = LETTERS.indexOf key[0]
+# 			digit = DIGITS.indexOf key[1]
+# 			fill if (letter+digit) % 2 == 0 then 'gray' else 'lightgray'
+# 			if chessWrapper.state.from == LETTERS[letter] + DIGITS[digit]
+# 				fill 'green'
+# 			noStroke()
+# 			rect OX + x, OY + y, 4*RADIUS_PIXEL
 
-	stroke 'black'
-	[px,py] = grid_pixel.p
-	[tx,ty] = grid_pixel[target]
-	line OX + px, OY + py, OX + tx, OY + ty
+# 	stroke 'black'
+# 	[px,py] = grid_pixel.p
+# 	[tx,ty] = grid_pixel[target]
+# 	line OX + px, OY + py, OX + tx, OY + ty
 
-	noStroke()
-	push()
-	fill '#444'
-	textSize 0.02 * height
-	for i in range 8
-		text LETTERS[i], 10 + i*SIZE_PIXEL, 55 + 7 * SIZE_PIXEL # letters
-		text DIGITS[i],  width-8,           10 + (i+0.043)*SIZE_PIXEL # digits
-	pop()
+# 	noStroke()
+# 	push()
+# 	fill '#444'
+# 	textSize 0.02 * height
+# 	for i in range 8
+# 		text LETTERS[i], 10 + i*SIZE_PIXEL, 55 + 7 * SIZE_PIXEL # letters
+# 		text DIGITS[i],  width-8,           10 + (i+0.043)*SIZE_PIXEL # digits
+# 	pop()
 
-	push()
-	fill 'yellow'
-	textSize 2*0.03 * height
-	textAlign LEFT
-	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0, 8.5 * SIZE_PIXEL
-	textAlign CENTER
-	text target, 0.5 * width, 8.5 * SIZE_PIXEL
-	textAlign RIGHT
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm', width, 8.5 * SIZE_PIXEL
-	pop()
+# 	push()
+# 	fill 'yellow'
+# 	textSize 2*0.03 * height
+# 	textAlign LEFT
+# 	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0, 8.5 * SIZE_PIXEL
+# 	textAlign CENTER
+# 	text target, 0.5 * width, 8.5 * SIZE_PIXEL
+# 	textAlign RIGHT
+# 	text round(distanceBetween(matrix.p, matrix[target])) + 'm', width, 8.5 * SIZE_PIXEL
+# 	pop()
 
-	push()
-	fill '#777'
-	textAlign LEFT
-	textSize 0.034 * height
-	for i in range messages.length
-		text messages[i], 0, 9.3 * SIZE_PIXEL + i * 0.04 * height
-	pop()
+# 	push()
+# 	fill '#777'
+# 	textAlign LEFT
+# 	textSize 0.034 * height
+# 	for i in range messages.length
+# 		text messages[i], 0, 9.3 * SIZE_PIXEL + i * 0.04 * height
+# 	pop()
 
-	letters = "RNBQKBNR"
-	for i in range 8
-		image PIECES['B'+letters[i]], i*SIZE_PIXEL, 0*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-		image PIECES['BP'],           i*SIZE_PIXEL, 1*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-		image PIECES['WP'],           i*SIZE_PIXEL, 6*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-		image PIECES['W'+letters[i]], i*SIZE_PIXEL, 7*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+# 	letters = "RNBQKBNR"
+# 	for i in range 8
+# 		image PIECES['B'+letters[i]], i*SIZE_PIXEL, 0*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+# 		image PIECES['BP'],           i*SIZE_PIXEL, 1*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+# 		image PIECES['WP'],           i*SIZE_PIXEL, 6*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+# 		image PIECES['W'+letters[i]], i*SIZE_PIXEL, 7*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+
+
+class ChessWrapper
+	constructor: () ->
+		@chess = new Chess()
+
+		moves = @chess.moves verbose: true
+		echo moves.map (m) -> "#{m.from}#{m.to}"
+
+		@state =
+			from: null
+			to: null
+			fromReached: false
+			toReached: false
+			centerReached: false
+
+	# highlightFrom : () ->
+	# highlightTo : () ->
+
+	clickSquare : (square) ->
+		if not @state.from
+			@state.from = square
+			# @highlightFrom square
+		else if not @state.to
+			@state.to = square
+			if @validateMove @state.from, @state.to
+				# @highlightTo square
+				console.log "Drag godkänt, vänta på fysiska besök"
+			else
+				console.log "Ogiltigt drag, börjar om"
+				# @resetState()
+
+	validateMove : (from, to) ->
+		moves = @chess.moves square: from, verbose: true
+		moves.some (m) -> m.to is to
+
+	resetState : ->
+		@state =
+			from: null
+			to: null
+			fromReached: false
+			toReached: false
+			centerReached: false
+		@clearHighlights()
+
+	gpsPositionReached : (squareName) ->
+		if squareName is @state.from and not @state.fromReached
+			@state.fromReached = true
+			console.log "Från-ruta besökt"
+		else if squareName is @state.to and @state.fromReached and not @state.toReached
+			@state.toReached = true
+			console.log "Till-ruta besökt"
+		else if squareName is "center" and @state.toReached and not @state.centerReached
+			@state.centerReached = true
+			console.log "Centrumrutan besökt"
+			@completeMove()
+
+	completeMove : ->
+		@chess.move from: @state.from, to: @state.to
+		updateBoard()
+		@toggleClock()
+		@resetState()
+
+	toggleClock : ->
+		console.log "Schackklocka växlas!"
+
+# board = Chessboard 'myBoard','start'
+# echo board
+
+
+board2 = Chessboard 'myBoard', 'start'
+	# draggable: true
+	# dropOffBoard: 'trash'
+	# sparePieces: true
+
+$('#startBtn').on 'click', board2.start
+$('#clearBtn').on 'click', board2.clear
+
+# chessWrapper = new ChessWrapper
+# echo chessWrapper
