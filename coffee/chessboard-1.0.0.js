@@ -1787,7 +1787,7 @@
       // longer in the DOM
 
       // get the border size
-      boardBorderSize = parseInt($board.css('borderLeftWidth'), 10)
+      boardBorderSize = parseInt($board.css('borderLeftWidth'), 0)  // was 10 Christer Nilsson
 
       // set the size and draw the board
       widget.resize()

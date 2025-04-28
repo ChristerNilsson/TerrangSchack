@@ -40,6 +40,17 @@ range = _.range
 watchID = null
 gpsCount = 0
 
+boardDiv = document.getElementById('board')
+
+game = new Chess()
+
+$status = $ '#status' # jquery används inuti chessBoard
+$fen = $ '#fen'
+$pgn = $ '#pgn'
+
+FROM = '#baca44' # '#f6f669'
+TO   = '#baca44'
+
 dump = (msg) ->
 	messages.unshift msg # nyaste överst
 	if messages.length > 20 then messages.pop() # äldsta droppas
@@ -362,6 +373,44 @@ initSounds = ->
 # 		image PIECES['WP'],           i*SIZE_PIXEL, 6*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
 # 		image PIECES['W'+letters[i]], i*SIZE_PIXEL, 7*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
 
+updateStatus = ->
+	status = ''
+	moveColor = 'White'
+	if game.turn() == 'b' then moveColor = 'Black'
+	if game.in_checkmate() then status = 'Game over, ' + moveColor + ' is in checkmate.'
+	else if game.in_draw() then status = 'Game over, drawn position'
+	else 
+		status = moveColor + ' to move'
+		if game.in_check() then status += ', ' + moveColor + ' is in check'
+
+	$status.html status
+	$fen.html game.fen()
+	$pgn.html game.pgn()
+
+# Rita en cirkel i SVG på absolut koordinat (x, y)
+drawSvgCircle = (x, y, radius = 10, color = 'red') ->
+  svg = document.getElementById('overlay')
+  circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+  circle.setAttribute('cx', x)
+  circle.setAttribute('cy', y)
+  circle.setAttribute('r', radius)
+  circle.setAttribute('fill', color)
+  svg.appendChild(circle)
+
+# Rita en linje från (x1, y1) till (x2, y2)
+drawSvgLine = (x1, y1, x2, y2, color = 'blue', width = 4) ->
+  svg = document.getElementById('overlay')
+  line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+  line.setAttribute('x1', x1)
+  line.setAttribute('y1', y1)
+  line.setAttribute('x2', x2)
+  line.setAttribute('y2', y2)
+  line.setAttribute('stroke', color)
+  line.setAttribute('stroke-width', width)
+  line.setAttribute('stroke-linecap', 'round')
+  svg.appendChild(line)
+
+
 
 class ChessWrapper
 	constructor: () ->
@@ -427,17 +476,88 @@ class ChessWrapper
 	toggleClock : ->
 		console.log "Schackklocka växlas!"
 
-# board = Chessboard 'myBoard','start'
+# board = Chessboard 'board','start'
 # echo board
 
+onDragStart = (source, piece, position, orientation) ->
+	# if game.game_over() then return false
+	# if game.turn() == 'w' and piece.search(/^b/) != -1 then false
+	# if game.turn() == 'b' and piece.search(/^w/) != -1 then false
+	# true
+	
+onDrop = (source, target) ->
+	move = game.move
+		from: source
+		to: target
+		promotion: 'q' # NOTE: always promote to a queen for example simplicity
+	
+	# illegal move
+	if move == null then return 'snapback'
 
-board2 = Chessboard 'myBoard', 'start',
+	updateStatus()
+
+# update the board position after the piece snap
+# for castling, en passant, pawn promotion
+# onSnapEnd = -> board.position game.fen()
+
+onSnapEnd = ->
+  clearHighlights()
+  fen = game.fen()
+  board.position(fen)
+
+  # Hämta senaste drag från Chess-historik
+  moves = game.history({ verbose: true })
+  if moves.length > 0
+    lastMove = moves[moves.length - 1]
+    highlightSquare(lastMove.from, FROM )
+    highlightSquare(lastMove.to, TO)
+
+
+clearHighlights = ->
+  squares = boardDiv.querySelectorAll('[data-square]')
+  for square in squares
+    square.style.background = ''
+
+highlightSquare = (square, color = '#a9a9a9') ->
+  el = boardDiv.querySelector("[data-square='#{square}']")
+  if el
+    el.style.background = color
+
+
+config = 
 	draggable: true
-	dropOffBoard: 'trash'
-	sparePieces: true
+	position: 'start'
+	onDragStart: onDragStart
+	onDrop: onDrop
+	onSnapEnd: onSnapEnd
 
-$('#startBtn').on 'click', board2.start
-$('#clearBtn').on 'click', board2.clear
+board = Chessboard 'board', config
+
+echo board
+
+getOverlaySize = (element) ->
+  elem = document.getElementById(element)
+  echo elem
+  rect = elem.getBoundingClientRect()
+  echo rect
+  rect
+
+getOverlaySize 'board'
+getOverlaySize 'overlay'
+
+a = 0
+d = 392
+drawSvgLine(a,a, d, d,'yellow',1)       
+drawSvgCircle(a,a, 3, 'red')            
+drawSvgCircle(a+0.125*d,  a+0.125*d, 3, 'red')             
+drawSvgCircle(a+0.25* d,  a+0.25*d, 3, 'red')             
+drawSvgCircle(a+0.5 * d,  a+0.5*d, 3, 'red')            
+drawSvgCircle(a+0.75 * d, a+0.75*d, 3, 'red')           
+drawSvgCircle(a+d,a+d, 3, 'red')            
+# drawSvgCircle(a+1.02*d, a+1.02*d, 3, 'red')            
+
+$('#startBtn').on 'click', board.start
+$('#clearBtn').on 'click', board.clear
 
 # chessWrapper = new ChessWrapper
 # echo chessWrapper

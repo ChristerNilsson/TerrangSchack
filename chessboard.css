@@ -5,9 +5,15 @@
 }
 
 .board-b72b1 {
-  border: 2px solid #404040;
-  box-sizing: content-box;
+  border: 0px solid #404040;
+  /* box-sizing: content-box; */
 }
+
+/* .board-b72b1 { */
+  /* border: none !important; */
+  /* padding: 0 !important; */
+  /* margin: 0 !important; */
+/* } */
 
 .square-55d63 {
   float: left;

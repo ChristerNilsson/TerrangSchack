@@ -13,8 +13,8 @@ $status = $ '#status' # jquery används inuti chessBoard
 $fen = $ '#fen'
 $pgn = $ '#pgn'
 
-fromColor = '#baca44' # '#f6f669'
-toColor = '#baca44'
+FROM = '#baca44' # '#f6f669'
+TO   = '#baca44'
 
 onDragStart = (source, piece, position, orientation) ->
 	# if game.game_over() then return false
@@ -46,8 +46,8 @@ onSnapEnd = ->
   moves = game.history({ verbose: true })
   if moves.length > 0
     lastMove = moves[moves.length - 1]
-    highlightSquare(lastMove.from, fromColor )
-    highlightSquare(lastMove.to, toColor)
+    highlightSquare(lastMove.from, FROM )
+    highlightSquare(lastMove.to, TO)
 
 
 clearHighlights = ->
