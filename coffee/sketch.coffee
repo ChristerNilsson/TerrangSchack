@@ -431,10 +431,10 @@ class ChessWrapper
 # echo board
 
 
-board2 = Chessboard 'myBoard', 'start'
-	# draggable: true
-	# dropOffBoard: 'trash'
-	# sparePieces: true
+board2 = Chessboard 'myBoard', 'start',
+	draggable: true
+	dropOffBoard: 'trash'
+	sparePieces: true
 
 $('#startBtn').on 'click', board2.start
 $('#clearBtn').on 'click', board2.clear
