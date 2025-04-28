@@ -247,20 +247,29 @@ initSounds = ->
 
 # window.preload = ->
 # 	initSounds()
-# 	for piece in "KQRBNP"	
+# 	for piece in "KQRBNP"
 # 		PIECES["B#{piece}"] = loadImage "./pieces/B#{piece}.svg"
 # 		PIECES["W#{piece}"] = loadImage "./pieces/W#{piece}.svg"
+
+window.setup = ->
+
+	SIZE_PIXEL = window.windowWidth/8 # En schackrutas storlek i pixlar
+	SIZE_METER = 10 # En schackrutas storlek i meter
+	FACTOR = SIZE_PIXEL / SIZE_METER
+	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
+	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
+
+	d = window.windowWidth - 2
+	[x1,y1] = [0.5*d, 0.5*d]
+	[x2,y2] = [3*SIZE_PIXEL, 8*SIZE_PIXEL]
+	drawSvgLine x1,y1,x2,y2,'black',2
+	drawSvgCircle x1,y1, RADIUS_PIXEL, 'yellow'
+	drawSvgCircle x2,y2, RADIUS_PIXEL, 'red'
 
 # window.setup = ->
 # 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
 
 # 	rectMode CENTER
-
-# 	SIZE_PIXEL = width/8 # En schackrutas storlek i pixlar
-# 	SIZE_METER = 10 # En schackrutas storlek i meter
-# 	FACTOR = SIZE_PIXEL / SIZE_METER
-# 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
-# 	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
 
 # 	grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
 # 	grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
@@ -410,8 +419,6 @@ drawSvgLine = (x1, y1, x2, y2, color = 'blue', width = 4) ->
   line.setAttribute('stroke-linecap', 'round')
   svg.appendChild(line)
 
-
-
 class ChessWrapper
 	constructor: () ->
 		@chess = new Chess()
@@ -501,6 +508,7 @@ onDrop = (source, target) ->
 # onSnapEnd = -> board.position game.fen()
 
 onSnapEnd = ->
+  echo 'onSnapEnd'
   clearHighlights()
   fen = game.fen()
   board.position(fen)
@@ -512,7 +520,6 @@ onSnapEnd = ->
     highlightSquare(lastMove.from, FROM )
     highlightSquare(lastMove.to, TO)
 
-
 clearHighlights = ->
   squares = boardDiv.querySelectorAll('[data-square]')
   for square in squares
@@ -522,7 +529,6 @@ highlightSquare = (square, color = '#a9a9a9') ->
   el = boardDiv.querySelector("[data-square='#{square}']")
   if el
     el.style.background = color
-
 
 config = 
 	draggable: true
@@ -545,16 +551,6 @@ getOverlaySize = (element) ->
 getOverlaySize 'board'
 getOverlaySize 'overlay'
 
-a = 0
-d = 392
-drawSvgLine(a,a, d, d,'yellow',1)       
-drawSvgCircle(a,a, 3, 'red')            
-drawSvgCircle(a+0.125*d,  a+0.125*d, 3, 'red')             
-drawSvgCircle(a+0.25* d,  a+0.25*d, 3, 'red')             
-drawSvgCircle(a+0.5 * d,  a+0.5*d, 3, 'red')            
-drawSvgCircle(a+0.75 * d, a+0.75*d, 3, 'red')           
-drawSvgCircle(a+d,a+d, 3, 'red')            
-# drawSvgCircle(a+1.02*d, a+1.02*d, 3, 'red')            
 
 $('#startBtn').on 'click', board.start
 $('#clearBtn').on 'click', board.clear
