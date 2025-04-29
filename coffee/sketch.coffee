@@ -1,4 +1,4 @@
-VERSION = 72
+VERSION = 73
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -254,6 +254,7 @@ window.setup = ->
 	grid_pixel.ss = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # origo, samlingspunkt
 
 	frameRate 10
+	textSize 40
 
 	matrix.ss = START_POINT 
 	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, i * SIZE_METER, 90 for i in [0...8])
@@ -281,11 +282,10 @@ window.draw = ->
 	background 'black'
 
 	push()
-	textAlign LEFT
+	textAlign LEFT,TOP
 	fill 'white'
-	textSize 20
 	for i in range messages.length
-		text messages[i], 0, (i+2.5) * 0.2 * SIZE_PIXEL
+		text messages[i], 0, (i+1.5) * 40 # 0.2 * SIZE_PIXEL
 	pop()
 
 	if target == "" or not matrix.p or not matrix[target] then return
@@ -293,13 +293,12 @@ window.draw = ->
 	fill 255
 	push()
 	fill 'yellow'
-	textSize 20
-	textAlign LEFT
-	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.25 * SIZE_PIXEL
+	textAlign LEFT,TOP
+	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.1 * SIZE_PIXEL
 	textAlign CENTER
-	text target, 0.5 * width, 0.25 * SIZE_PIXEL
+	text target, 0.5 * width, 0.1 * SIZE_PIXEL
 	textAlign RIGHT
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.25 * SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.1 * SIZE_PIXEL
 	pop()
 
 	showTarget target,"p"
