@@ -1,4 +1,4 @@
-VERSION = 73
+VERSION = 74
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -243,8 +243,6 @@ window.preload = ->
 window.setup = ->
 	createCanvas window.windowWidth-2, 200, document.getElementById "canvas"
 
-	dump 'Klicka här för att starta GPS:en'
-
 	SIZE_PIXEL = window.windowWidth/8 # En schackrutas storlek i pixlar
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
@@ -270,6 +268,9 @@ window.setup = ->
 	target = "ss"
 
 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
+	dump "#{width} x #{height} #{SIZE_PIXEL}"
+	dump 'Klicka här för att starta GPS:en'
+
 
 	# assert 224, round distanceBetween matrix.c1, matrix.d3
 	# assert  27, round bearingBetween matrix.c1, matrix.d3
