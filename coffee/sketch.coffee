@@ -1,9 +1,10 @@
-VERSION = 71
+VERSION = 72
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
+SIZE_METER = 10 # En schackrutas storlek i meter
 
+# Dessa beräknas i setup.
 SIZE_PIXEL = 0 # En schackrutas storlek i pixlar
-SIZE_METER = 0 # En schackrutas storlek i meter
 FACTOR = 1
 RADIUS_METER = 0 # meter. Maxavstånd mellan spelaren och target
 RADIUS_PIXEL = 0
@@ -19,18 +20,14 @@ DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 
 LETTERS = 'abcdefgh'
 DIGITS = '87654321'
 
-PIECES = {}
-
-chessWrapper = null
-
-targets = []
-target = ""
+targets = [] # t ex ["e2","e4","ss"] from to center square
+target = "ss"
 
 messages = []
 sounds = {}
 started = false
 
-matrix = {} # WGS84
+matrix = {} # WGS84 {lat,lon}
 grid_meter = {}
 grid_pixel = {}
 
@@ -48,6 +45,7 @@ $status = $ '#status' # jquery används inuti chessBoard
 $fen = $ '#fen'
 $pgn = $ '#pgn'
 
+# visar vilket drag som utförts.
 FROM = '#baca44' # '#f6f669'
 TO   = '#baca44'
 
@@ -136,11 +134,12 @@ increaseQueue = (p) ->
 		gpsLon = round p.coords.longitude,6
 
 wp = (p) =>
-	#sounds.soundDown.play()
+	sounds.soundDown.play()
 	gpsCount += 1
+	if not matrix.p then matrix.p = {}
 	matrix.p.lat = p.coords.latitude
 	matrix.p.lon = p.coords.longitude
-	grid_meter.p = makePoint matrix.s, matrix.p
+	grid_meter.p = makePoint matrix.ss, matrix.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
 	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target])}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" 
 
@@ -155,21 +154,14 @@ wp = (p) =>
 
 wperr = (err) -> dump "Fel: #{err.message}"
 
-# window.touchStarted = () ->
-# 	echo mouseX, mouseY
-# 	if mouseY > 8 * SIZE_PIXEL
-# 		if not started
-# 			userStartAudio()
-# 			startTracking()
-# 			started = true
-# 		sounds.soundDown.play()
-# 	else
-# 		letter = LETTERS[round mouseX / SIZE_PIXEL - 0.5]
-# 		digit  =  DIGITS[round mouseY / SIZE_PIXEL - 0.5]
-# 		echo letter + digit
-# 		chessWrapper.clickSquare letter + digit
-
-# 	return false
+window.touchStarted = () ->
+	if started then return false
+	messages = []
+	userStartAudio()
+	startTracking()
+	started = true
+	sounds.soundDown.play()
+	return false 
 
 startTracking = ->
 
@@ -177,7 +169,7 @@ startTracking = ->
 		dump "Geolocation stöds inte i din webbläsare."
 		return
 
-	dump "Begär platsdata..."
+	# dump "GPS startad"
 
 	watchID = navigator.geolocation.watchPosition wp, wperr,
 		enableHighAccuracy: true 
@@ -245,142 +237,72 @@ initSounds = ->
 		sound.pan 0
 		sounds[name] = sound
 
-# window.preload = ->
-# 	initSounds()
-# 	for piece in "KQRBNP"
-# 		PIECES["B#{piece}"] = loadImage "./pieces/B#{piece}.svg"
-# 		PIECES["W#{piece}"] = loadImage "./pieces/W#{piece}.svg"
+window.preload = ->
+	initSounds()
 
 window.setup = ->
+	createCanvas window.windowWidth-2, 200, document.getElementById "canvas"
+
+	dump 'Klicka här för att starta GPS:en'
 
 	SIZE_PIXEL = window.windowWidth/8 # En schackrutas storlek i pixlar
-	SIZE_METER = 10 # En schackrutas storlek i meter
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
 
-	d = window.windowWidth - 2
-	[x1,y1] = [0.5*d, 0.5*d]
-	[x2,y2] = [3*SIZE_PIXEL, 8*SIZE_PIXEL]
-	drawSvgLine x1,y1,x2,y2,'black',2
-	drawSvgCircle x1,y1, RADIUS_PIXEL, 'yellow'
-	drawSvgCircle x2,y2, RADIUS_PIXEL, 'red'
+	grid_meter.ss = [4*SIZE_METER, 4*SIZE_METER] # origo, samlingspunkt
+	grid_pixel.ss = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # origo, samlingspunkt
 
-# window.setup = ->
-# 	createCanvas windowWidth-5, windowHeight-5, document.getElementById "canvas"
+	frameRate 10
 
-# 	rectMode CENTER
+	matrix.ss = START_POINT 
+	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, i * SIZE_METER, 90 for i in [0...8])
 
-# 	grid_meter.s = [3.5*SIZE_METER, 3.5*SIZE_METER] # origo, samlingspunkt
-# 	grid_pixel.s = [3.5*SIZE_PIXEL, 3.5*SIZE_PIXEL] # origo, samlingspunkt
+	for i in range 8
+		for j in range 8
+			key = "#{LETTERS[i]}#{DIGITS[j]}"
+			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
+			grid_pixel[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
+			grid_meter[key] = [(i+0.5) * SIZE_METER, (j+0.5) * SIZE_METER]
 
-# 	grid_meter.p = [0.5*SIZE_METER, 0.5*SIZE_METER] # origo, samlingspunkt
-# 	grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL] # origo, samlingspunkt
+	targets = []
+	target = "ss"
 
-# 	textAlign CENTER,CENTER
-# 	textSize 0.04 * height
-# 	noFill()
-# 	frameRate 2
+	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
 
-# 	matrix.s = START_POINT 
-# 	arr = (destinationPoint matrix.s.lat, matrix.s.lon, i * SIZE_METER, 90 for i in [0...8])
+	# assert 224, round distanceBetween matrix.c1, matrix.d3
+	# assert  27, round bearingBetween matrix.c1, matrix.d3
+	# assert  90, round bearingBetween matrix.c3, matrix.d3
+	# assert 108, round bearingBetween matrix.a4, matrix.d3
+	# assert 214, round bearingBetween matrix.c4, matrix.a1
+	# assert 297, round bearingBetween matrix.d2, matrix.b3
 
-# 	for i in range 8
-# 		for j in range 8
-# 			key = "#{LETTERS[i]}#{DIGITS[j]}"
-# 			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
-# 			grid_pixel[key] = [i * SIZE_PIXEL, j * SIZE_PIXEL]
-# 			grid_meter[key] = [i * SIZE_METER, j * SIZE_METER]
+window.draw = ->
+	background 'black'
 
-# 	targets = _.keys matrix
-# 	targets = 's a1 a8 h1 h8 p'.split ' '
-# 	# targets = _.shuffle targets
-# 	echo targets
-# 	target = targets.shift()
+	push()
+	textAlign LEFT
+	fill 'white'
+	textSize 20
+	for i in range messages.length
+		text messages[i], 0, (i+2.5) * 0.2 * SIZE_PIXEL
+	pop()
 
-# 	# NW hörnet
-# 	lat = (matrix.a8.lat + matrix.b7.lat) / 2
-# 	lon = (matrix.a8.lon + matrix.b7.lon) / 2
-# 	matrix.p = {lat, lon}
-# 	# grid_pixel.p = [0.5*SIZE_PIXEL, 0.5*SIZE_PIXEL]
-# 	# grid_meter.p = [grid_pixel.p[0] / FACTOR, grid_pixel.p[1] / FACTOR]
+	if target == "" or not matrix.p or not matrix[target] then return
 
-# 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
+	fill 255
+	push()
+	fill 'yellow'
+	textSize 20
+	textAlign LEFT
+	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.25 * SIZE_PIXEL
+	textAlign CENTER
+	text target, 0.5 * width, 0.25 * SIZE_PIXEL
+	textAlign RIGHT
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.25 * SIZE_PIXEL
+	pop()
 
-# 	echo 'matrix',matrix
-# 	echo 'grid_meter',grid_meter
-# 	echo 'grid_pixel',grid_pixel
-
-# 	# assert 224, round distanceBetween matrix.c1, matrix.d3
-# 	# assert  27, round bearingBetween matrix.c1, matrix.d3
-# 	# assert  90, round bearingBetween matrix.c3, matrix.d3
-# 	# assert 108, round bearingBetween matrix.a4, matrix.d3
-# 	# assert 214, round bearingBetween matrix.c4, matrix.a1
-# 	# assert 297, round bearingBetween matrix.d2, matrix.b3
-
-# window.draw = ->
-# 	background 0
-# 	OX = (width - 7*SIZE_PIXEL) / 2 # offset x
-# 	OY = 2*RADIUS_PIXEL # offset y
-
-# 	keys = Object.keys(grid_pixel).sort()
-# 	for key in keys
-# 		[x,y] = grid_pixel[key]
-# 		stroke 'white'
-# 		if key == target then stroke 'red'
-# 		if key == 'p' then stroke 'yellow'
-# 		if key in [target, 'p'] 
-# 			noFill()
-# 			strokeWeight 2
-# 			circle OX + x, OY + y, 2*RADIUS_PIXEL
-# 		else
-# 			letter = LETTERS.indexOf key[0]
-# 			digit = DIGITS.indexOf key[1]
-# 			fill if (letter+digit) % 2 == 0 then 'gray' else 'lightgray'
-# 			if chessWrapper.state.from == LETTERS[letter] + DIGITS[digit]
-# 				fill 'green'
-# 			noStroke()
-# 			rect OX + x, OY + y, 4*RADIUS_PIXEL
-
-# 	stroke 'black'
-# 	[px,py] = grid_pixel.p
-# 	[tx,ty] = grid_pixel[target]
-# 	line OX + px, OY + py, OX + tx, OY + ty
-
-# 	noStroke()
-# 	push()
-# 	fill '#444'
-# 	textSize 0.02 * height
-# 	for i in range 8
-# 		text LETTERS[i], 10 + i*SIZE_PIXEL, 55 + 7 * SIZE_PIXEL # letters
-# 		text DIGITS[i],  width-8,           10 + (i+0.043)*SIZE_PIXEL # digits
-# 	pop()
-
-# 	push()
-# 	fill 'yellow'
-# 	textSize 2*0.03 * height
-# 	textAlign LEFT
-# 	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0, 8.5 * SIZE_PIXEL
-# 	textAlign CENTER
-# 	text target, 0.5 * width, 8.5 * SIZE_PIXEL
-# 	textAlign RIGHT
-# 	text round(distanceBetween(matrix.p, matrix[target])) + 'm', width, 8.5 * SIZE_PIXEL
-# 	pop()
-
-# 	push()
-# 	fill '#777'
-# 	textAlign LEFT
-# 	textSize 0.034 * height
-# 	for i in range messages.length
-# 		text messages[i], 0, 9.3 * SIZE_PIXEL + i * 0.04 * height
-# 	pop()
-
-# 	letters = "RNBQKBNR"
-# 	for i in range 8
-# 		image PIECES['B'+letters[i]], i*SIZE_PIXEL, 0*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-# 		image PIECES['BP'],           i*SIZE_PIXEL, 1*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-# 		image PIECES['WP'],           i*SIZE_PIXEL, 6*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
-# 		image PIECES['W'+letters[i]], i*SIZE_PIXEL, 7*SIZE_PIXEL, SIZE_PIXEL, SIZE_PIXEL
+	showTarget target,"p"
 
 updateStatus = ->
 	status = ''
@@ -395,6 +317,19 @@ updateStatus = ->
 	$status.html status
 	$fen.html game.fen()
 	$pgn.html game.pgn()
+
+showTarget = (p,q) ->
+	[x1,y1] = grid_pixel[target]
+	[x2,y2] = grid_pixel.p
+	clearOverlay()
+	drawSvgLine x1,y1,x2,y2,'black',2
+	drawSvgCircle x1,y1, RADIUS_PIXEL, 'yellow'
+	drawSvgCircle x2,y2, RADIUS_PIXEL, 'red'
+
+clearOverlay = ->
+  svg = document.getElementById('overlay')
+  while svg.firstChild
+    svg.removeChild(svg.firstChild)
 
 # Rita en cirkel i SVG på absolut koordinat (x, y)
 drawSvgCircle = (x, y, radius = 10, color = 'red') ->
@@ -419,78 +354,11 @@ drawSvgLine = (x1, y1, x2, y2, color = 'blue', width = 4) ->
   line.setAttribute('stroke-linecap', 'round')
   svg.appendChild(line)
 
-class ChessWrapper
-	constructor: () ->
-		@chess = new Chess()
-
-		moves = @chess.moves verbose: true
-		echo moves.map (m) -> "#{m.from}#{m.to}"
-
-		@state =
-			from: null
-			to: null
-			fromReached: false
-			toReached: false
-			centerReached: false
-
-	# highlightFrom : () ->
-	# highlightTo : () ->
-
-	clickSquare : (square) ->
-		if not @state.from
-			@state.from = square
-			# @highlightFrom square
-		else if not @state.to
-			@state.to = square
-			if @validateMove @state.from, @state.to
-				# @highlightTo square
-				console.log "Drag godkänt, vänta på fysiska besök"
-			else
-				console.log "Ogiltigt drag, börjar om"
-				# @resetState()
-
-	validateMove : (from, to) ->
-		moves = @chess.moves square: from, verbose: true
-		moves.some (m) -> m.to is to
-
-	resetState : ->
-		@state =
-			from: null
-			to: null
-			fromReached: false
-			toReached: false
-			centerReached: false
-		@clearHighlights()
-
-	gpsPositionReached : (squareName) ->
-		if squareName is @state.from and not @state.fromReached
-			@state.fromReached = true
-			console.log "Från-ruta besökt"
-		else if squareName is @state.to and @state.fromReached and not @state.toReached
-			@state.toReached = true
-			console.log "Till-ruta besökt"
-		else if squareName is "center" and @state.toReached and not @state.centerReached
-			@state.centerReached = true
-			console.log "Centrumrutan besökt"
-			@completeMove()
-
-	completeMove : ->
-		@chess.move from: @state.from, to: @state.to
-		updateBoard()
-		@toggleClock()
-		@resetState()
-
-	toggleClock : ->
-		console.log "Schackklocka växlas!"
-
-# board = Chessboard 'board','start'
-# echo board
-
-onDragStart = (source, piece, position, orientation) ->
-	# if game.game_over() then return false
-	# if game.turn() == 'w' and piece.search(/^b/) != -1 then false
-	# if game.turn() == 'b' and piece.search(/^w/) != -1 then false
-	# true
+# onDragStart = (source, piece, position, orientation) ->
+# 	# if game.game_over() then return false
+# 	# if game.turn() == 'w' and piece.search(/^b/) != -1 then false
+# 	# if game.turn() == 'b' and piece.search(/^w/) != -1 then false
+# 	# true
 	
 onDrop = (source, target) ->
 	move = game.move
@@ -508,7 +376,6 @@ onDrop = (source, target) ->
 # onSnapEnd = -> board.position game.fen()
 
 onSnapEnd = ->
-  echo 'onSnapEnd'
   clearHighlights()
   fen = game.fen()
   board.position(fen)
@@ -519,6 +386,11 @@ onSnapEnd = ->
     lastMove = moves[moves.length - 1]
     highlightSquare(lastMove.from, FROM )
     highlightSquare(lastMove.to, TO)
+  dump "#{lastMove.from}-#{lastMove.to}"
+
+  targets = [lastMove.from, lastMove.to, "ss"]
+  target = targets.shift()
+  echo target,targets
 
 clearHighlights = ->
   squares = boardDiv.querySelectorAll('[data-square]')
@@ -533,27 +405,17 @@ highlightSquare = (square, color = '#a9a9a9') ->
 config = 
 	draggable: true
 	position: 'start'
-	onDragStart: onDragStart
+	# onDragStart: onDragStart
 	onDrop: onDrop
 	onSnapEnd: onSnapEnd
 
 board = Chessboard 'board', config
 
-echo board
-
 getOverlaySize = (element) ->
   elem = document.getElementById(element)
-  echo elem
-  rect = elem.getBoundingClientRect()
-  echo rect
-  rect
-
-getOverlaySize 'board'
-getOverlaySize 'overlay'
-
+  elem.getBoundingClientRect()
 
 $('#startBtn').on 'click', board.start
-$('#clearBtn').on 'click', board.clear
-
-# chessWrapper = new ChessWrapper
-# echo chessWrapper
+$('#clearBtn').on 'click', () ->
+	clearOverlay()
+	target = targets.shift()
