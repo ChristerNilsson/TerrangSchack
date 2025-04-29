@@ -1,4 +1,4 @@
-VERSION = 74
+VERSION = 75
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -241,7 +241,8 @@ window.preload = ->
 	initSounds()
 
 window.setup = ->
-	createCanvas window.windowWidth-2, 200, document.getElementById "canvas"
+	h = window.windowHeight - window.windowWidth
+	createCanvas window.windowWidth-4, h-4, document.getElementById "canvas"
 
 	SIZE_PIXEL = window.windowWidth/8 # En schackrutas storlek i pixlar
 	FACTOR = SIZE_PIXEL / SIZE_METER
@@ -415,7 +416,7 @@ getOverlaySize = (element) ->
   elem = document.getElementById(element)
   elem.getBoundingClientRect()
 
-$('#startBtn').on 'click', board.start
-$('#clearBtn').on 'click', () ->
-	clearOverlay()
-	target = targets.shift()
+#$('#startBtn').on 'click', board.start
+#$('#clearBtn').on 'click', () ->
+#	clearOverlay()
+#	target = targets.shift()
