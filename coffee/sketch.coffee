@@ -1,4 +1,4 @@
-VERSION = 75
+VERSION = 76
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -134,7 +134,7 @@ increaseQueue = (p) ->
 		gpsLon = round p.coords.longitude,6
 
 wp = (p) =>
-	sounds.soundDown.play()
+	# sounds.soundDown.play()
 	gpsCount += 1
 	if not matrix.p then matrix.p = {}
 	matrix.p.lat = p.coords.latitude
