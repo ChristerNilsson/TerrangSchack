@@ -1,4 +1,4 @@
-VERSION = 76
+VERSION = 77
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -241,7 +241,7 @@ window.preload = ->
 	initSounds()
 
 window.setup = ->
-	h = window.windowHeight - window.windowWidth
+	h = window.windowHeight - window.windowWidth - 110
 	createCanvas window.windowWidth-4, h-4, document.getElementById "canvas"
 
 	SIZE_PIXEL = window.windowWidth/8 # En schackrutas storlek i pixlar
