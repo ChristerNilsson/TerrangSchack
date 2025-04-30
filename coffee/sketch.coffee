@@ -1,4 +1,4 @@
-VERSION = 90
+VERSION = 91
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -455,7 +455,8 @@ selectedSquare = null
 # });
 
 
-boardDiv.addEventListener 'click', (event) ->
+
+handleClick = (event) ->
   clickTarget = event.target.closest '.square-55d63'
 
 #   clickTarget = event.target
@@ -496,3 +497,6 @@ boardDiv.addEventListener 'click', (event) ->
     highlightSquare clickSquare, '#baca44'
 
   echo 'selectedSquare',selectedSquare
+
+boardDiv.addEventListener 'click', handleClick
+boardDiv.addEventListener 'touch', handleClick
