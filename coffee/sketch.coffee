@@ -1,4 +1,4 @@
-VERSION = 87
+VERSION = 88
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -273,7 +273,7 @@ window.setup = ->
 
 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
 	dump "#{width} x #{height} #{SIZE_PIXEL}"
-	dump 'Klicka här för att starta GPS:en'
+	dump 'Klicka här för att starta!'
 
 	# assert 224, round distanceBetween matrix.c1, matrix.d3
 	# assert  27, round bearingBetween matrix.c1, matrix.d3
