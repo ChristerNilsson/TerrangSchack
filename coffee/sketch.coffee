@@ -1,4 +1,4 @@
-VERSION = 79
+VERSION = 81
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -242,9 +242,10 @@ window.preload = ->
 
 window.setup = ->
 	h = window.windowHeight - window.windowWidth
-	createCanvas window.windowWidth-4, h-2, document.getElementById "canvas"
 
-	SIZE_PIXEL = round window.windowWidth/8 # En schackrutas storlek i pixlar. round är nödvändigt!
+	SIZE_PIXEL = round 976/8 # En schackrutas storlek i pixlar. round är nödvändigt!
+	# if SIZE_PIXEL % 2 == 1 then SIZE_PIXEL -= 1
+	createCanvas window.windowWidth, 200, document.getElementById "canvas"
 
 	dump "SIZE_PIZEL #{SIZE_PIXEL}"
 
@@ -285,8 +286,8 @@ testPattern = ->
 	clearOverlay()
 	for i in range 9
 		for j in range 9
-			x = (i) * SIZE_PIXEL
-			y = (j) * SIZE_PIXEL
+			x = i * SIZE_PIXEL
+			y = j * SIZE_PIXEL
 			drawSvgLine x,y-8,x,y+8,'black',1
 			drawSvgLine x-8,y,x+8,y,'black',1
 
