@@ -246,7 +246,7 @@ window.setup = ->
 
 	SIZE_PIXEL = round window.windowWidth/8 # En schackrutas storlek i pixlar. round är nödvändigt!
 
-	echo SIZE_PIXEL
+	dump "SIZE_PIZEL #{SIZE_PIXEL}"
 
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
@@ -256,7 +256,6 @@ window.setup = ->
 	grid_pixel.ss = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # origo, samlingspunkt
 
 	frameRate 10
-	textSize 0.4*SIZE_PIXEL
 
 	matrix.ss = START_POINT 
 	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, i * SIZE_METER, 90 for i in [0...8])
@@ -295,23 +294,25 @@ window.draw = ->
 	background 'black'
 
 	push()
+	textSize 0.3 * SIZE_PIXEL
 	textAlign LEFT,TOP
 	fill 'white'
 	for i in range messages.length
-		text messages[i], 0, (i+1.5) * 40 # 0.2 * SIZE_PIXEL
+		text messages[i], 0, (i+2.5) * 0.3 * SIZE_PIXEL
 	pop()
 
 	if target == "" or not matrix.p or not matrix[target] then return
 
 	fill 255
 	push()
+	textSize 0.4 * SIZE_PIXEL
 	fill 'yellow'
 	textAlign LEFT,TOP
-	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.25 * SIZE_PIXEL
+	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.2 * SIZE_PIXEL
 	textAlign CENTER
-	text target, 0.5 * width, 0.25 * SIZE_PIXEL
+	text target, 0.5 * width, 0.2 * SIZE_PIXEL
 	textAlign RIGHT
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.25 * SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.2 * SIZE_PIXEL
 	pop()
 
 	showTarget target,"p"
