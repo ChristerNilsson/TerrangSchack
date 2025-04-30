@@ -1,6 +1,6 @@
-VERSION = 99
+VERSION = 100
 
-START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
+START_POINT = lat : 59.27, lon : 18.13 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
 
 # Dessa beräknas i setup.
@@ -248,26 +248,33 @@ window.setup = ->
 	SIZE_PIXEL = round 976/8 # En schackrutas storlek i pixlar. integer!
 	createCanvas window.windowWidth-20, 700, document.getElementById "canvas"
 
-	dump "SIZE_PIXEL #{SIZE_PIXEL}"
 
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
 
+	dump "SIZE_PIXEL #{SIZE_PIXEL}"
+	dump "FACTOR #{FACTOR}"
+
 	grid_meter.ss = [4*SIZE_METER, 4*SIZE_METER] # origo, samlingspunkt
 	grid_pixel.ss = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # origo, samlingspunkt
 
-	frameRate 10
+	frameRate 30
 
 	matrix.ss = START_POINT 
-	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, i * SIZE_METER, 90 for i in [0...8])
+	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, (i-3.5) * SIZE_METER, 90 for i in [0...8])
 
 	for i in range 8
 		for j in range 8
 			key = "#{LETTERS[i]}#{DIGITS[j]}"
-			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, j * SIZE_METER, 180
+			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j-3.5) * SIZE_METER, 180
 			grid_pixel[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
 			grid_meter[key] = [(i+0.5) * SIZE_METER, (j+0.5) * SIZE_METER]
+
+
+	echo 'matrix',matrix
+	echo 'grid_meter',grid_meter
+	echo 'grid_pixel',grid_pixel
 
 	targets = []
 	target = "ss"
