@@ -1,4 +1,4 @@
-VERSION = 77
+VERSION = 78
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -241,10 +241,13 @@ window.preload = ->
 	initSounds()
 
 window.setup = ->
-	h = window.windowHeight - window.windowWidth - 110
-	createCanvas window.windowWidth-4, h-4, document.getElementById "canvas"
+	h = window.windowHeight - window.windowWidth
+	createCanvas window.windowWidth-4, h-2, document.getElementById "canvas"
 
-	SIZE_PIXEL = window.windowWidth/8 # En schackrutas storlek i pixlar
+	SIZE_PIXEL = round window.windowWidth/8 # En schackrutas storlek i pixlar. round är nödvändigt!
+
+	echo SIZE_PIXEL
+
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
@@ -253,7 +256,7 @@ window.setup = ->
 	grid_pixel.ss = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # origo, samlingspunkt
 
 	frameRate 10
-	textSize 40
+	textSize 0.4*SIZE_PIXEL
 
 	matrix.ss = START_POINT 
 	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, i * SIZE_METER, 90 for i in [0...8])
@@ -272,13 +275,21 @@ window.setup = ->
 	dump "#{width} x #{height} #{SIZE_PIXEL}"
 	dump 'Klicka här för att starta GPS:en'
 
-
 	# assert 224, round distanceBetween matrix.c1, matrix.d3
 	# assert  27, round bearingBetween matrix.c1, matrix.d3
 	# assert  90, round bearingBetween matrix.c3, matrix.d3
 	# assert 108, round bearingBetween matrix.a4, matrix.d3
 	# assert 214, round bearingBetween matrix.c4, matrix.a1
 	# assert 297, round bearingBetween matrix.d2, matrix.b3
+
+testPattern = ->
+	clearOverlay()
+	for i in range 9
+		for j in range 9
+			x = (i) * SIZE_PIXEL
+			y = (j) * SIZE_PIXEL
+			drawSvgLine x,y-8,x,y+8,'black',1
+			drawSvgLine x-8,y,x+8,y,'black',1
 
 window.draw = ->
 	background 'black'
@@ -296,14 +307,16 @@ window.draw = ->
 	push()
 	fill 'yellow'
 	textAlign LEFT,TOP
-	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.1 * SIZE_PIXEL
+	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.25 * SIZE_PIXEL
 	textAlign CENTER
-	text target, 0.5 * width, 0.1 * SIZE_PIXEL
+	text target, 0.5 * width, 0.25 * SIZE_PIXEL
 	textAlign RIGHT
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.1 * SIZE_PIXEL
+	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.25 * SIZE_PIXEL
 	pop()
 
 	showTarget target,"p"
+
+	testPattern()
 
 updateStatus = ->
 	status = ''
