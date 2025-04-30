@@ -1,6 +1,6 @@
-VERSION = 100
+VERSION = 101
 
-START_POINT = lat : 59.27, lon : 18.13 # Kaninparken
+START_POINT = lat : 59.27, lon : 18.13 # Kaninparken. Brädets mittpunkt
 SIZE_METER = 10 # En schackrutas storlek i meter
 
 # Dessa beräknas i setup.
@@ -20,14 +20,14 @@ DISTLIST = '2 4 6 8 10 12 14 16 18 20 25 30 35 40 45 50 60 70 80 90 100 120 140 
 LETTERS = 'abcdefgh'
 DIGITS = '87654321'
 
-targets = [] # t ex ["e2","e4","ss"] from to center square
-target = "ss"
+targets = [] # t ex ["e2","e4","zenter"] from to zenter square
+target = "zenter"
 
 messages = []
 sounds = {}
 started = false
 
-matrix = {} # WGS84 {lat,lon}
+wgs = {} # WGS84 {lat,lon}
 grid_meter = {}
 grid_pixel = {}
 
@@ -136,16 +136,16 @@ increaseQueue = (p) ->
 wp = (p) =>
 	# sounds.soundDown.play()
 	gpsCount += 1
-	if not matrix.p then matrix.p = {}
-	matrix.p.lat = p.coords.latitude
-	matrix.p.lon = p.coords.longitude
-	grid_meter.p = makePoint matrix.ss, matrix.p
+	if not wgs.p then wgs.p = {}
+	wgs.p.lat = p.coords.latitude
+	wgs.p.lon = p.coords.longitude
+	grid_meter.p = makePoint wgs.origin, wgs.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
-	dump "#{gpsCount} • #{round bearingBetween matrix.p, matrix[target]}° • #{target} • #{round distanceBetween(matrix.p, matrix[target])}m" # • #{round p.coords.latitude,6} • #{round p.coords.longitude,6}" 
+	dump "#{gpsCount} • #{round bearingBetween wgs.p, wgs[target]}° • #{target} • #{round distanceBetween(wgs.p, wgs[target])}m" # • #{round p.coords.latitude,6} • #{round p.coords.longitude,6}" 
 	
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
-	if RADIUS_METER < distanceBetween matrix.p, matrix[target] then return
+	if RADIUS_METER < distanceBetween wgs.p, wgs[target] then return
 	if targets.length == 0
 		target = ''
 		clearOverlay()
@@ -248,7 +248,6 @@ window.setup = ->
 	SIZE_PIXEL = round 976/8 # En schackrutas storlek i pixlar. integer!
 	createCanvas window.windowWidth-20, 700, document.getElementById "canvas"
 
-
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
 	RADIUS_PIXEL = 0.25 * SIZE_PIXEL
@@ -256,39 +255,43 @@ window.setup = ->
 	dump "SIZE_PIXEL #{SIZE_PIXEL}"
 	dump "FACTOR #{FACTOR}"
 
-	grid_meter.ss = [4*SIZE_METER, 4*SIZE_METER] # origo, samlingspunkt
-	grid_pixel.ss = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # origo, samlingspunkt
+	wgs.origin = destinationPoint START_POINT.lat, START_POINT.lon, sqrt(2) * 4 * SIZE_METER, 315
+	grid_meter.origin = [0,0]
+	grid_pixel.origin = [0,0]
+
+	grid_meter.zenter = [4*SIZE_METER, 4*SIZE_METER] # samlingspunkt, brädets mittpunkt
+	grid_pixel.zenter = [4*SIZE_PIXEL, 4*SIZE_PIXEL] # samlingspunkt, brädets mittpunkt
 
 	frameRate 30
 
-	matrix.ss = START_POINT 
-	arr = (destinationPoint matrix.ss.lat, matrix.ss.lon, (i-3.5) * SIZE_METER, 90 for i in [0...8])
+	wgs.zenter = START_POINT
+	arr = (destinationPoint wgs.zenter.lat, wgs.zenter.lon, (i-3.5) * SIZE_METER, 90 for i in [0...8])
 
 	for i in range 8
 		for j in range 8
 			key = "#{LETTERS[i]}#{DIGITS[j]}"
-			matrix[key] = destinationPoint arr[i].lat, arr[i].lon, (j-3.5) * SIZE_METER, 180
+			wgs[key] = destinationPoint arr[i].lat, arr[i].lon, (j-3.5) * SIZE_METER, 180
 			grid_pixel[key] = [(i+0.5) * SIZE_PIXEL, (j+0.5) * SIZE_PIXEL]
 			grid_meter[key] = [(i+0.5) * SIZE_METER, (j+0.5) * SIZE_METER]
 
 
-	echo 'matrix',matrix
+	echo 'wgs',wgs
 	echo 'grid_meter',grid_meter
 	echo 'grid_pixel',grid_pixel
 
 	targets = []
-	target = "ss"
+	target = "zenter"
 
 	dump "V:#{VERSION} S:#{SIZE_METER}m R:#{RADIUS_METER}m #{START_POINT.lat} #{START_POINT.lon}"  
 	dump "#{width} x #{height} #{SIZE_PIXEL}"
 	dump 'Klicka här för att starta!'
 
-	# assert 224, round distanceBetween matrix.c1, matrix.d3
-	# assert  27, round bearingBetween matrix.c1, matrix.d3
-	# assert  90, round bearingBetween matrix.c3, matrix.d3
-	# assert 108, round bearingBetween matrix.a4, matrix.d3
-	# assert 214, round bearingBetween matrix.c4, matrix.a1
-	# assert 297, round bearingBetween matrix.d2, matrix.b3
+	# assert 224, round distanceBetween wgs.c1, wgs.d3
+	# assert  27, round bearingBetween wgs.c1, wgs.d3
+	# assert  90, round bearingBetween wgs.c3, wgs.d3
+	# assert 108, round bearingBetween wgs.a4, wgs.d3
+	# assert 214, round bearingBetween wgs.c4, wgs.a1
+	# assert 297, round bearingBetween wgs.d2, wgs.b3
 
 testPattern = ->
 	# clearOverlay()
@@ -310,18 +313,18 @@ window.draw = ->
 		text messages[i], 0.5 * width, (i+2.5) * 0.4 * SIZE_PIXEL
 	pop()
 
-	if target == "" or not matrix.p or not matrix[target] then return
+	if target == "" or not wgs.p or not wgs[target] then return
 
 	fill 255
 	push()
 	textSize 0.8 * SIZE_PIXEL
 	fill 'yellow'
 	textAlign LEFT,CENTER
-	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.55 * SIZE_PIXEL
+	text round(bearingBetween(wgs.p, wgs[target])) + '°', 0.01*width, 0.55 * SIZE_PIXEL
 	textAlign CENTER
 	text target, 0.5 * width, 0.55 * SIZE_PIXEL
 	textAlign RIGHT
-	text round(distanceBetween(matrix.p, matrix[target])) + 'm', 0.99*width, 0.55 * SIZE_PIXEL
+	text round(distanceBetween(wgs.p, wgs[target])) + 'm', 0.99*width, 0.55 * SIZE_PIXEL
 	pop()
 
 	showTarget target,"p"
@@ -417,7 +420,7 @@ onSnapEnd = ->
     highlightSquare(lastMove.to, TO)
   dump "#{lastMove.from}-#{lastMove.to}"
 
-  targets = [lastMove.from, lastMove.to, "ss"]
+  targets = [lastMove.from, lastMove.to, "zenter"]
   target = targets.shift()
   echo target,targets
 
@@ -492,7 +495,7 @@ handleClick = (event) ->
       dump "#{move.from}-#{move.to} #{target} #{targets}"
 
 
-      targets = [move.from, move.to, "ss"]
+      targets = [move.from, move.to, "zenter"]
       target = targets.shift()
 
     else
