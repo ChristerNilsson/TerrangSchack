@@ -1,4 +1,4 @@
-VERSION = 94
+VERSION = 95
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
