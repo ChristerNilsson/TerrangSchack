@@ -1,4 +1,4 @@
-VERSION = 98
+VERSION = 99
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -141,7 +141,7 @@ wp = (p) =>
 	matrix.p.lon = p.coords.longitude
 	grid_meter.p = makePoint matrix.ss, matrix.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
-	dump "#{gpsCount} • #{round bearingBetween matrix.p, matrix[target]}° • #{target} • #{round distanceBetween(matrix.p, matrix[target])}m • #{round p.coords.latitude,6} • #{round p.coords.longitude,6}" 
+	dump "#{gpsCount} • #{round bearingBetween matrix.p, matrix[target]}° • #{target} • #{round distanceBetween(matrix.p, matrix[target])}m" # • #{round p.coords.latitude,6} • #{round p.coords.longitude,6}" 
 	
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
