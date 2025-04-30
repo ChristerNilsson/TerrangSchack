@@ -1,4 +1,4 @@
-VERSION = 93
+VERSION = 94
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -482,14 +482,13 @@ handleClick = (event) ->
       clearOverlay()
       highlightSquare move.from, '#baca44'
       highlightSquare move.to, '#baca44'
+      dump "#{move.from}-#{move.to} #{target} #{targets}"
 
       targets = [move.from, move.to, "ss"]
       target = targets.shift()
-      echo target,targets
 
     else
-      # Ogiltigt drag, ignorera
-      console.log "Ogiltigt drag"
+      dump "Ogiltigt drag"
 
     selectedSquare = null
   else
