@@ -1,4 +1,4 @@
-VERSION = 83
+VERSION = 84
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -306,7 +306,7 @@ window.draw = ->
 
 	fill 255
 	push()
-	textSize 0.4 * SIZE_PIXEL
+	textSize 0.8 * SIZE_PIXEL
 	fill 'yellow'
 	textAlign LEFT,TOP
 	text round(bearingBetween(matrix.p, matrix[target])) + '°', 0.01*width, 0.2 * SIZE_PIXEL
