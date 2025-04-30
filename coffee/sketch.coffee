@@ -1,4 +1,4 @@
-VERSION = 82
+VERSION = 83
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -245,9 +245,9 @@ window.setup = ->
 
 	SIZE_PIXEL = round 976/8 # En schackrutas storlek i pixlar. round är nödvändigt!
 	# if SIZE_PIXEL % 2 == 1 then SIZE_PIXEL -= 1
-	createCanvas window.windowWidth, 600, document.getElementById "canvas"
+	createCanvas window.windowWidth, 700, document.getElementById "canvas"
 
-	dump "SIZE_PIZEL #{SIZE_PIXEL}"
+	dump "SIZE_PIXEL #{SIZE_PIXEL}"
 
 	FACTOR = SIZE_PIXEL / SIZE_METER
 	RADIUS_METER = 0.25 * SIZE_METER # meter. Maxavstånd mellan spelaren och target
@@ -295,11 +295,11 @@ window.draw = ->
 	background 'black'
 
 	push()
-	textSize 0.3 * SIZE_PIXEL
+	textSize 0.4 * SIZE_PIXEL
 	textAlign CENTER,TOP
 	fill 'white'
 	for i in range messages.length
-		text messages[i], 0.5 * width, (i+2.5) * 0.3 * SIZE_PIXEL
+		text messages[i], 0.5 * width, (i+2.5) * 0.4 * SIZE_PIXEL
 	pop()
 
 	if target == "" or not matrix.p or not matrix[target] then return
