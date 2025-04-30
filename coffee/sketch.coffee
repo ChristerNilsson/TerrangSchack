@@ -1,4 +1,4 @@
-VERSION = 88
+VERSION = 89
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -318,7 +318,6 @@ window.draw = ->
 
 	showTarget target,"p"
 
-
 updateStatus = ->
 	status = ''
 	moveColor = 'White'
@@ -336,7 +335,7 @@ updateStatus = ->
 showTarget = (p,q) ->
 	[x1,y1] = grid_pixel[target]
 	[x2,y2] = grid_pixel.p
-	dump "#{target} #{round x1} #{round y1} #{round x2} #{round y2}"
+	# dump "#{target} #{round x1} #{round y1} #{round x2} #{round y2}"
 	clearOverlay()
 	drawSvgLine x1,y1,x2,y2,'black',2
 	drawSvgCircle x1,y1, RADIUS_PIXEL, 'yellow'
@@ -347,8 +346,6 @@ showTarget = (p,q) ->
 	d = RADIUS_PIXEL
 	drawSvgLine x,y-d,x,y+d,'black',1
 	drawSvgLine x-d,y,x+d,y,'black',1
-
-	# testPattern()
 
 clearOverlay = ->
   svg = document.getElementById('overlay')
