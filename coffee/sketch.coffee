@@ -1,4 +1,4 @@
-VERSION = 97
+VERSION = 98
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -141,7 +141,7 @@ wp = (p) =>
 	matrix.p.lon = p.coords.longitude
 	grid_meter.p = makePoint matrix.ss, matrix.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
-	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target])}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" 
+	dump "#{gpsCount} • #{round bearingBetween matrix.p, matrix[target]}° • #{target} • #{round distanceBetween(matrix.p, matrix[target])}m • #{round p.coords.latitude,6} • #{round p.coords.longitude,6}" 
 	
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
@@ -230,7 +230,7 @@ initSounds = ->
 		sounds[name] = sound
 
 window.touchStarted = () ->
-	dump 'touchStarted'
+	# dump 'touchStarted'
 	if started then return false
 	messages = []
 	userStartAudio()
@@ -246,7 +246,7 @@ window.setup = ->
 	h = window.windowHeight - window.windowWidth
 
 	SIZE_PIXEL = round 976/8 # En schackrutas storlek i pixlar. integer!
-	createCanvas window.windowWidth, 700, document.getElementById "canvas"
+	createCanvas window.windowWidth-20, 700, document.getElementById "canvas"
 
 	dump "SIZE_PIXEL #{SIZE_PIXEL}"
 
@@ -457,7 +457,7 @@ selectedSquare = null
 
 
 handleClick = (event) ->
-  dump 'handleClick'
+#   dump 'handleClick'
   clickTarget = event.target.closest '.square-55d63'
 
 #   clickTarget = event.target
@@ -477,11 +477,13 @@ handleClick = (event) ->
     
     if move
       board.position game.fen()
+    #   board.flip()
       clearHighlights()
       clearOverlay()
       highlightSquare move.from, '#baca44'
       highlightSquare move.to, '#baca44'
       dump "#{move.from}-#{move.to} #{target} #{targets}"
+
 
       targets = [move.from, move.to, "ss"]
       target = targets.shift()
