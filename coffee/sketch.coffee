@@ -1,4 +1,4 @@
-VERSION = 95
+VERSION = 96
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -247,7 +247,7 @@ window.setup = ->
 
 	SIZE_PIXEL = round 976/8 # En schackrutas storlek i pixlar. round är nödvändigt!
 	# if SIZE_PIXEL % 2 == 1 then SIZE_PIXEL -= 1
-	createCanvas window.windowWidth, 700, document.getElementById "canvas"
+	createCanvas window.windowWidth-20, 700, document.getElementById "canvas"
 
 	dump "SIZE_PIXEL #{SIZE_PIXEL}"
 
