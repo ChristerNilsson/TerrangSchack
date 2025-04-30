@@ -1,4 +1,4 @@
-VERSION = 89
+VERSION = 90
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -142,12 +142,13 @@ wp = (p) =>
 	grid_meter.p = makePoint matrix.ss, matrix.p
 	grid_pixel.p = [grid_meter.p[0] * FACTOR, grid_meter.p[1] * FACTOR]
 	dump "#{gpsCount} #{round bearingBetween matrix.p, matrix[target]}° #{target} #{round distanceBetween(matrix.p, matrix[target])}m #{round p.coords.latitude,6} #{round p.coords.longitude,6}" 
-
+	
 	# om man är inom RADIUS meter från målet, byt mål
 	if target == '' then return
 	if RADIUS_METER < distanceBetween matrix.p, matrix[target] then return
 	if targets.length == 0
 		target = ''
+		clearOverlay()
 		return
 	sounds.soundDown.play()
 	target = targets.shift()
@@ -424,11 +425,11 @@ highlightSquare = (square, color = '#a9a9a9') ->
     el.style.background = color
 
 config = 
-	draggable: true
+	draggable: false
 	position: 'start'
 	# onDragStart: onDragStart
-	onDrop: onDrop
-	onSnapEnd: onSnapEnd
+	# onDrop: onDrop
+	# onSnapEnd: onSnapEnd
 
 board = Chessboard 'board', config
 
@@ -440,3 +441,58 @@ getOverlaySize = (element) ->
 #$('#clearBtn').on 'click', () ->
 #	clearOverlay()
 #	target = targets.shift()
+
+selectedSquare = null
+
+# boardDiv = document.getElementById('board')
+
+
+# boardDiv.addEventListener('click', (event) => {
+#   const el = event.target.closest('.square-55d63');
+#   if (!el) return;
+#   const square = el.getAttribute('data-square');
+#   if (square) handleInput(square);
+# });
+
+
+boardDiv.addEventListener 'click', (event) ->
+  clickTarget = event.target.closest '.square-55d63'
+
+#   clickTarget = event.target
+  echo 'clickTarget',clickTarget
+
+  return unless clickTarget.classList.contains 'square-55d63'
+
+  clickSquare = clickTarget.getAttribute 'data-square'
+  echo 'clickSquare',clickSquare
+
+  if selectedSquare
+    # Försök göra draget
+    move = game.move
+      from: selectedSquare
+      to: clickSquare
+      promotion: 'q'
+    
+    if move
+      board.position game.fen()
+      clearHighlights()
+      clearOverlay()
+      highlightSquare move.from, '#baca44'
+      highlightSquare move.to, '#baca44'
+
+      targets = [move.from, move.to, "ss"]
+      target = targets.shift()
+      echo target,targets
+
+    else
+      # Ogiltigt drag, ignorera
+      console.log "Ogiltigt drag"
+
+    selectedSquare = null
+  else
+    selectedSquare = clickSquare
+    clearHighlights()
+    clearOverlay()
+    highlightSquare clickSquare, '#baca44'
+
+  echo 'selectedSquare',selectedSquare
