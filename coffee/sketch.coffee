@@ -1,4 +1,4 @@
-VERSION = 91
+VERSION = 92
 
 START_POINT = lat : 59.2702, lon : 18.1303 # Kaninparken
 SIZE_METER = 10 # En schackrutas storlek i meter
@@ -155,15 +155,6 @@ wp = (p) =>
 
 wperr = (err) -> dump "Fel: #{err.message}"
 
-window.touchStarted = () ->
-	if started then return false
-	messages = []
-	userStartAudio()
-	startTracking()
-	started = true
-	sounds.soundDown.play()
-	return false 
-
 startTracking = ->
 
 	if not navigator.geolocation
@@ -237,6 +228,16 @@ initSounds = ->
 		sound.setVolume 1.0
 		sound.pan 0
 		sounds[name] = sound
+
+window.touchStarted = () ->
+	dump 'touchStarted'
+	if started then return false
+	messages = []
+	userStartAudio()
+	startTracking()
+	started = true
+	sounds.soundDown.play()
+	return false 
 
 window.preload = ->
 	initSounds()
@@ -457,6 +458,7 @@ selectedSquare = null
 
 
 handleClick = (event) ->
+  dump 'handleClick'
   clickTarget = event.target.closest '.square-55d63'
 
 #   clickTarget = event.target
