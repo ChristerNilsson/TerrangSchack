@@ -15,3 +15,6 @@ python server.py
 
 Servern använder `terrangschack.db`. Realtidsuppdateringar skickas med
 Server-Sent Events och motståndardrag aviseras med ett pling i klienten.
+
+GPS kräver att platsåtkomst tillåts i webbläsaren. `localhost` fungerar vid
+lokal utveckling; på en mobiltelefon ska servern exponeras över HTTPS.

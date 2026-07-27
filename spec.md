@@ -62,3 +62,16 @@
 * Admin anropar via ?parti=1&spelare=0
 * Skapa servern
 * Skapa klienten
+* Klienten ska vara ansvarig för att visa senaste drag samt även bara acceptera tillåtna drag.
+* Senaste draget visas genom att bakgrundsfärgerna för Från och Till visas med annan färg.
+* Aktuell schackklocka ska ticka ner
+* Visa dragen med kort schacknotation. T ex Sf3
+* Klockorna ska visas även för Admin. En klocka ska dessutom ticka ner.
+
+* För att ett drag ska godkännas, t ex e2-e4, måste spelaren högerklicka både på e2 och e4 i godtycklig ordning. Ordningen blir vänsterklick på e2, vänsterklick på e4, högerklick på den ena rutan, därefter högerklick på den andra rutan.
+
+* Klienten ska nu markera aktuell ruta. Denna kan påverkas med fyra knappar, upp, ner, vänster, höger. Istället för att högerklicka på en ruta, ska man nu ta sig till rutan mha dessa fyra knappar.
+
+* De fyra knapparna ska nu ersättas med att man fysiskt, i terrängen, går till de båda rutorna. När man nått en ruta, hörs en pling och man går till nästa ruta. Då båda rutorna nåtts, utförs draget.
+
+* Om schackbrädet är 800 meter stort, är varje ruta 100x100. Om avståndet till rutans centrum är mindre än 25 meter, har man nått rutan. Här används alltså mobiltelefonens GPS. Målrutans centrum kan beräknas eftersom man vet schackbrädets centrum och storlek, samt rotationen. Det borde gå att approximera genom att antaga att WGS84 uppför sig linjärt vid små avstånd. Beräkna först de fyra hörnens WGS84-koordinater och därefter kan de 64 rutornas WGS84-koordinater beräknas med interpolation.

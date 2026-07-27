@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#17251d">
   <title>Terrängschack</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260727-6">
 </head>
 <body>
   <header>
@@ -25,7 +25,7 @@
           <div><small id="whiteRole">VIT · DU</small><strong id="whiteName">Maja Lind</strong></div>
           <time id="whiteClock">1:27:42</time>
         </article>
-        <div class="versus"><span>DRAG 12</span><b>VS</b></div>
+        <div class="versus"><span id="moveNumber">DRAG 3</span><b>VS</b></div>
         <article class="player black">
           <img src="img/chesspieces/wikipedia/bK.png" alt="">
           <div><small id="blackRole">SVART</small><strong id="blackName">Erik Holm</strong></div>
@@ -36,19 +36,26 @@
       <div class="game-grid board-only">
         <section class="panel board-panel">
           <div class="panel-head">
-            <div><small>STÄLLNING</small><h1>Ditt drag</h1></div>
+            <div><small>STÄLLNING</small><h1 id="turnStatus">Ditt drag</h1></div>
             <span class="live">● ANSLUTEN</span>
           </div>
           <div id="board" class="board" aria-label="Schackbräde"></div>
-          <p class="last-move"><span></span> Senaste drag: <b>… Sf6–e4</b></p>
+          <div class="gps-navigation" aria-live="polite">
+            <div><small>GPS</small><strong id="gpsStatus">VÄNTAR</strong></div>
+            <div><small>NÄSTA RUTA</small><strong id="gpsTarget">–</strong></div>
+            <div><small>AVSTÅND</small><strong id="gpsDistance">–</strong></div>
+            <button id="startGps" type="button">⌖ Starta GPS</button>
+          </div>
+          <p class="move-help" id="moveHelp">Välj ett drag. Besök sedan båda rutorna fysiskt; inom 25 meter hörs en pling.</p>
+          <p class="last-move"><span></span> Senaste drag: <b id="lastMove">… Sf6–e4</b></p>
         </section>
 
       </div>
 
       <section class="actions">
         <button id="draw">⚑ &nbsp; Erbjud remi</button>
-        <button id="acceptDraw">✓ &nbsp; Acceptera remi</button>
-        <button id="declineDraw">× &nbsp; Avslå remi</button>
+        <button id="acceptDraw" hidden>✓ &nbsp; Acceptera remi</button>
+        <button id="declineDraw" hidden>× &nbsp; Avslå remi</button>
         <button class="danger" id="resign">⚐ &nbsp; Ge upp</button>
       </section>
     </section>
@@ -70,18 +77,26 @@
           <h2>Betänketid</h2>
           <div class="form-grid">
             <label>Betänketid<select id="timeControl"><option value="5400,30">90 min + 30 sek/drag</option><option value="3600,30">60 min + 30 sek/drag</option><option value="1800,10">30 min + 10 sek/drag</option></select></label>
+            <label>Brädets storlek (meter)<input id="boardSize" type="number" min="80" step="10" value="800"></label>
+            <label>Centrum, latitud (WGS84)<input id="boardLat" type="number" step="0.00000001" value="59.26996327"></label>
+            <label>Centrum, longitud (WGS84)<input id="boardLon" type="number" step="0.00000001" value="18.14979067"></label>
+            <label>Rotation (grader)<input id="boardRotation" type="number" min="0" max="359" step="1" value="20"></label>
           </div>
           <div class="form-actions"><button class="primary" type="submit">Skapa parti</button></div>
         </form>
         <section class="panel preview">
-          <div class="panel-head"><div><small>PÅGÅENDE PARTI</small><h2>Maja Lind – Erik Holm</h2></div><span class="live">● ONLINE</span></div>
+          <div class="panel-head"><div><small>PÅGÅENDE PARTI</small><h2><span id="adminWhiteName">Maja Lind</span> – <span id="adminBlackName">Erik Holm</span></h2></div><span class="live">● ONLINE</span></div>
+          <div class="admin-clocks">
+            <article id="adminWhiteClockBox"><small>VIT</small><strong id="adminWhiteClock">1:27:42</strong></article>
+            <article id="adminBlackClockBox"><small>SVART</small><strong id="adminBlackClock">1:25:18</strong></article>
+          </div>
           <div id="adminBoard" class="board mini-board" aria-label="Aktuell ställning"></div>
-          <p>Senaste drag: <b>3. … Sf6–e4</b></p>
+          <p>Senaste drag: <b id="adminLastMove">Se4</b></p>
         </section>
       </div>
     </section>
   </main>
   <div id="toast" role="status"></div>
-  <script src="app.js"></script>
+  <script src="app.js?v=20260727-6"></script>
 </body>
 </html>

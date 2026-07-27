@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS spelare (
 
 CREATE TABLE IF NOT EXISTS parti (
   id          INTEGER PRIMARY KEY,
+  latitud     REAL NOT NULL,
+  longitud    REAL NOT NULL,
+  rotation    REAL NOT NULL DEFAULT 0,
+  storlek     REAL NOT NULL DEFAULT 800 CHECK (storlek > 0),
   vit_id      INTEGER NOT NULL REFERENCES spelare(id),
   svart_id    INTEGER NOT NULL REFERENCES spelare(id),
   inkrement   INTEGER NOT NULL DEFAULT 0 CHECK (inkrement >= 0),
@@ -35,12 +39,15 @@ INSERT OR IGNORE INTO spelare (id, namn, telefon, mail) VALUES
   (2, 'Erik Holm', '+46 70 987 65 43', 'erik@example.se');
 
 INSERT OR IGNORE INTO parti (
-  id, vit_id, svart_id, inkrement, vit_tid, svart_tid, status
+  id, latitud, longitud, rotation, storlek,
+  vit_id, svart_id, inkrement, vit_tid, svart_tid, status
 ) VALUES (
-  1, 1, 2, 30, 5262, 5118, 'pågår'
+  1, 59.26996327, 18.14979067, 20, 800,
+  1, 2, 30, 5400, 5400, 'pågår'
 );
 
 INSERT OR IGNORE INTO drag (parti_id, nummer, franruta, tillruta) VALUES
   (1, 1, 'e2', 'e4'),
   (1, 2, 'g8', 'f6'),
-  (1, 3, 'f6', 'e4');
+  (1, 3, 'b1', 'c3'),
+  (1, 4, 'f6', 'e4');
