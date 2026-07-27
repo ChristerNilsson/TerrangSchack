@@ -22,80 +22,61 @@
       <div class="scorebar">
         <article class="player active-player">
           <img src="img/chesspieces/wikipedia/wK.png" alt="">
-          <div><small>VIT · DU</small><strong id="whiteName">Maja Lind</strong></div>
+          <div><small id="whiteRole">VIT · DU</small><strong id="whiteName">Maja Lind</strong></div>
           <time id="whiteClock">1:27:42</time>
         </article>
         <div class="versus"><span>DRAG 12</span><b>VS</b></div>
         <article class="player black">
           <img src="img/chesspieces/wikipedia/bK.png" alt="">
-          <div><small>SVART</small><strong id="blackName">Erik Holm</strong></div>
+          <div><small id="blackRole">SVART</small><strong id="blackName">Erik Holm</strong></div>
           <time id="blackClock">1:25:18</time>
         </article>
       </div>
 
-      <div class="game-grid">
+      <div class="game-grid board-only">
         <section class="panel board-panel">
           <div class="panel-head">
             <div><small>STÄLLNING</small><h1>Ditt drag</h1></div>
-            <button class="seg active">Bräde</button><button class="seg">Karta</button>
+            <span class="live">● ANSLUTEN</span>
           </div>
           <div id="board" class="board" aria-label="Schackbräde"></div>
           <p class="last-move"><span></span> Senaste drag: <b>… Sf6–e4</b></p>
         </section>
 
-        <section class="panel mission">
-          <div class="eyebrow">AKTUELLT UPPDRAG</div>
-          <div class="target-title"><div class="target-icon">◎</div><div><small>BESÖK RUTA</small><h2>F3</h2></div><span class="status">1 AV 2</span></div>
-          <div class="terrain" id="terrain">
-            <div class="contour c1"></div><div class="contour c2"></div>
-            <div class="north">N</div><div class="target-dot"><i></i><b>F3</b></div>
-            <div class="you-dot"><i></i><b>DU</b></div>
-          </div>
-          <div class="guidance">
-            <div><small>BÄRING</small><strong id="bearing">072°</strong><span>ÖST-NORDOST</span></div>
-            <div><small>AVSTÅND</small><strong id="distance">184 m</strong><span>TILL MÅLET</span></div>
-          </div>
-          <div class="compass"><span>N</span><i></i><b>Följ riktningen</b></div>
-          <button class="primary" id="repeat">▶ &nbsp; Spela upp vägledning</button>
-          <p class="hint">Telefonen vibrerar när du når rutan</p>
-        </section>
       </div>
 
       <section class="actions">
         <button id="draw">⚑ &nbsp; Erbjud remi</button>
+        <button id="acceptDraw">✓ &nbsp; Acceptera remi</button>
+        <button id="declineDraw">× &nbsp; Avslå remi</button>
         <button class="danger" id="resign">⚐ &nbsp; Ge upp</button>
       </section>
     </section>
 
     <section id="admin" class="view">
-      <div class="admin-title"><div><small>PARTILEDNING</small><h1>Skapa terrängparti</h1></div><span class="live">● GPS REDO</span></div>
+      <div class="admin-title"><div><small>PARTILEDNING</small><h1>Skapa schackparti</h1></div><span class="live">● SERVER REDO</span></div>
       <div class="admin-grid">
         <form class="panel setup" id="setup">
           <h2>Spelare</h2>
           <div class="form-grid">
             <label>Vit spelare<input id="wName" value="Maja Lind"></label>
             <label>Svart spelare<input id="bName" value="Erik Holm"></label>
-            <label>E-post<input type="email" value="maja@example.se"></label>
-            <label>E-post<input type="email" value="erik@example.se"></label>
-            <label>Telefon<input type="tel" value="+46 70 123 45 67"></label>
-            <label>Telefon<input type="tel" value="+46 70 987 65 43"></label>
+            <label>E-post<input id="wMail" type="email" value="maja@example.se"></label>
+            <label>E-post<input id="bMail" type="email" value="erik@example.se"></label>
+            <label>Telefon<input id="wPhone" type="tel" value="+46 70 123 45 67"></label>
+            <label>Telefon<input id="bPhone" type="tel" value="+46 70 987 65 43"></label>
           </div>
           <hr>
-          <h2>Spelplan</h2>
+          <h2>Betänketid</h2>
           <div class="form-grid">
-            <label>Brädets storlek <output id="sizeOut">800 m</output><input id="size" type="range" min="200" max="2000" step="100" value="800"></label>
-            <label>Rotation <output id="rotationOut">20°</output><input id="rotation" type="range" min="0" max="350" step="10" value="20"></label>
-            <label>Betänketid<select><option>90 min + 30 sek/drag</option><option>60 min + 30 sek/drag</option><option>30 min + 10 sek/drag</option></select></label>
+            <label>Betänketid<select id="timeControl"><option value="5400,30">90 min + 30 sek/drag</option><option value="3600,30">60 min + 30 sek/drag</option><option value="1800,10">30 min + 10 sek/drag</option></select></label>
           </div>
-          <div class="form-actions"><button type="button" id="locate">⌖ Använd min position</button><button class="primary" type="submit">Skapa parti</button></div>
+          <div class="form-actions"><button class="primary" type="submit">Skapa parti</button></div>
         </form>
         <section class="panel preview">
-          <div class="panel-head"><div><small>LIVEPOSITIONER</small><h2>Spelarna</h2></div><span id="coords">59.2700, 18.1498</span></div>
-          <div class="position-list">
-            <article><span class="player-marker white-marker">♙</span><div><small>VIT</small><strong>Maja Lind</strong><code>59.26915, 18.14777</code></div><b>● ONLINE</b></article>
-            <article><span class="player-marker black-marker">♟</span><div><small>SVART</small><strong>Erik Holm</strong><code>59.27098, 18.15197</code></div><b>● ONLINE</b></article>
-          </div>
-          <p>Positionerna uppdateras löpande och lagras som WGS84.</p>
+          <div class="panel-head"><div><small>PÅGÅENDE PARTI</small><h2>Maja Lind – Erik Holm</h2></div><span class="live">● ONLINE</span></div>
+          <div id="adminBoard" class="board mini-board" aria-label="Aktuell ställning"></div>
+          <p>Senaste drag: <b>3. … Sf6–e4</b></p>
         </section>
       </div>
     </section>

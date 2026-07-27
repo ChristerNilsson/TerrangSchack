@@ -8,3 +8,4 @@
 .terrain>.contour{pointer-events:none}
 .terrain>.north,.terrain>.target-dot,.terrain>.you-dot,.map>.map-board,.map>.center-pin{z-index:2}
 .position-list{display:grid;gap:12px;margin-top:24px}.position-list article{display:flex;align-items:center;gap:14px;padding:18px;border:1px solid var(--line);border-radius:7px;background:white}.position-list article div{display:grid}.position-list strong{font:700 18px Georgia}.position-list code{font-size:11px;color:#697169}.position-list article>b{margin-left:auto;color:#527654;font-size:9px}.player-marker{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;font-size:24px}.white-marker{background:#ede9dd;border:1px solid #bbb8ac}.black-marker{background:var(--forest);color:white}
+.board-only{grid-template-columns:minmax(280px,680px);justify-content:center}.board-only .board-panel{width:100%}.panel-head>.live{margin-left:auto}.mini-board{max-width:390px;margin-top:24px}.admin-grid .setup{min-width:0}
