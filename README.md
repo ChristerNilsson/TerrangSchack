@@ -1,5 +1,10 @@
 # Terrängschack
 
+[Server]()
+[Vit]()
+[Svart]()
+[Admin]()
+
 Starta FastHTML-servern:
 
 ```powershell
